@@ -73,7 +73,7 @@
 | D-4 | 服务端托管平台与成本上限 | 二期启动前 |
 | D-5 | open-core 许可边界（云版哪些模块不开源） | 商业线启动前 |
 | D-6 | docs 一致性检查脚本（scripts/ 下校验跨文档术语/引用一致）是否进 M6 | v1.0.0 前 |
-| D-7 | tests/ 是否改按领域分组（借鉴原版 agents/cli/governance/learning/reporting）替代按 src 镜像 | M1 前（ fixture 大量入场前决策成本最低） |
+| D-7 | ~~tests/ 是否改按领域分组~~ 已决：保持 src 镜像 + integration 领域命名 | 已关闭（ADR-0010，2026-09-21） |
 | D-8 | 报告是否借鉴原版 templates/style 读者视角模板族（executive/analyst/audit-scorecard）作二期皮肤 | 二期启动前 |
 
 ## 7. 维护规则
