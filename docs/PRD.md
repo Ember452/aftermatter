@@ -2,6 +2,8 @@
 
 状态: 定稿（设计阶段） | 版本: v1.0 | 层级: 阶段 1 | 架构与契约详见 [architecture/](architecture/INDEX.md)
 
+> **曾用名**：`docs/aftermatter-项目设计文档.md`（ADR-0011 于 2026-09-21 统一为英文名）。
+
 ---
 
 ## 1. 背景与问题

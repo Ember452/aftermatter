@@ -2,6 +2,8 @@
 
 状态: 定稿 | 层级: 目录级契约（本文档只锁"目录与职责"，**不锁文件名**）
 
+> **曾用名**：`docs/aftermatter-项目结构.md`（ADR-0011 于 2026-09-21 统一为英文名）。
+
 > 定位：阶段 2 文档，回答"仓库长什么样、新代码放哪里"。
 > 模块内部职责见 architecture/modules.md；依赖方向硬规则见 architecture/overview.md §3。
 > **文件级布局由实现者自定**：只要目录职责不越界、依赖方向不违规，目录内怎么拆文件
@@ -91,9 +93,9 @@ tests/
 ```
 docs/
 ├── README.md                      # 总导航（阅读地图 + 文档纪律）
-├── aftermatter-项目设计文档.md      # 阶段 1：PRD / 功能需求 / 里程碑 / 指标 / 风险
-├── aftermatter-项目结构.md          # 阶段 2（本文档）
-├── aftermatter-开发计划.md          # 阶段 3：任务分解、排期与验收清单（已定稿）
+├── PRD.md                       # 阶段 1：PRD / 功能需求 / 里程碑 / 指标 / 风险
+├── REPO-LAYOUT.md               # 阶段 2（本文档）
+├── DEVELOPMENT-PLAN.md          # 阶段 3：任务分解、排期与验收清单（已定稿）
 ├── architecture/                  # 阶段 1+5：三契约篇 + INDEX + 12 篇模块内部设计（随实现升定稿）
 ├── specs/                         # 阶段 6：带日期的专题决策文档（YYYY-MM-DD-主题.md）
 ├── adr/                           # 阶段 6：编号一页式轻量决策（NNNN-标题.md）

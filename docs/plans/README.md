@@ -4,5 +4,5 @@
 
 命名：`<THEME>_PLAN.md` 大写蛇形（对齐成熟项目惯例），如 `ROADMAP.md`、`SERVER_V2_PLAN.md`。
 
-与开发计划的分工：`../aftermatter-开发计划.md` 管"一期怎么按序做"；
+与开发计划的分工：`../DEVELOPMENT-PLAN.md` 管"一期怎么按序做"；
 本目录管"一期之后往哪走、走到哪了"。

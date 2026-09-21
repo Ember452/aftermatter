@@ -52,7 +52,7 @@ class RawEvent(BaseModel):
 | `lifecycle` | 会话启动/恢复/压缩 | compact、resume |
 
 **解析边界**：适配器只允许产生以上 kind；未知行记录为 `unparsed_count` 并保留 ERef——
-**格式漂移第一信号是计数异常，不是崩溃**（对应设计文档 R1，见 [../aftermatter-项目设计文档.md](../aftermatter-项目设计文档.md) §10）。
+**格式漂移第一信号是计数异常，不是崩溃**（对应设计文档 R1，见 [../PRD.md](../PRD.md) 的“§10 风险与对策”）。
 
 ## 2. L1 · TaskEpisode
 

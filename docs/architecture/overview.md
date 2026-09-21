@@ -1,6 +1,6 @@
 # AfterMatter 系统架构
 
-状态: 定稿（设计阶段） | 版本: v1.0 | 对应: [../aftermatter-项目设计文档.md](../aftermatter-项目设计文档.md) v1.0
+状态: 定稿（设计阶段） | 版本: v1.0 | 对应: [../PRD.md](../PRD.md) v1.0
 
 ---
 
