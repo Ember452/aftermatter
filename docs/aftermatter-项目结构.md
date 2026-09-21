@@ -53,7 +53,7 @@ src/aftermatter/
 │   └── providers/       # LLM 客户端薄封装与错误分类
 ├── repair/          # 有界修复：方案校验、白名单引擎、dry-run/apply
 ├── sandbox/         # 执行级证据：容器环境、重放策略、限额
-├── longitudinal/    # 纵向验证：历史库、Ledger、Episode 匹配、混杂否决、统计
+├── longitudinal/    # 纵向验证：历史库、Ledger、Episode 匹配、单轴归因、统计
 ├── report/          # 渲染：报告模型校验、HTML/Markdown 输出
 ├── serve/           # 服务端（一期骨架）：API、模型、迁移
 ├── daemon/          # 本地常驻：定时驱动、上传管道

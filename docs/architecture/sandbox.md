@@ -19,6 +19,9 @@ SpecBuild  容器规格构造器：--network none、CPU/内存限额、pids 上�
 Replay     命令序列重建：取 Episode validations 的 identity 去重
            → 仅白名单类别（test/lint/build/typecheck）
            → 按原时序入队复跑 → ReplayResult[(identity, ok|fail|timeout, 有界输出尾)]
+Receipt    复跑前工作树状态收据：clean 断言，或记录 dirty 文件清单+内容哈希
+           （吸收原版 completeness receipt，ADR-0009）；无收据的复跑只能记为
+           contextual，不得回填 replay_ok
 回填       update_replay_ok(bundle, episode_id, identity, ok)
            ——全项目唯一写入口（其余模块只读 replay_ok；旁路 = ContractViolation）
 ```
@@ -32,4 +35,5 @@ Replay     命令序列重建：取 Episode validations 的 identity 去重
 ## 测试要点
 
 无 docker 环境的 unavailable 路径；限额生效集成测试（fork 炸弹/内存 hog 样例被杀）；
+dirty 工作树无收据 → contextual 路径（replay_ok 不写入）；
 identity 去重与时序保持；回填唯一入口的旁路拒绝测试；超时语义（timeout ≠ fail ≠ ok）。

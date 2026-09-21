@@ -1,6 +1,6 @@
 # AfterMatter 数据模型
 
-状态: 定稿（设计阶段） | schema 基线版本: event=2 / episode=2 / bundle=2 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash） | 更新: 2026-09-21
+状态: 定稿（设计阶段） | schema 基线版本: event=2 / episode=2 / bundle=3 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash）、ADR-0009（Comparison.axis_diff） | 更新: 2026-09-21
 
 > 本文档是全项目的契约源头。**改代码可以先乱，改这里的字段必须先改文档并递增版本号。**
 > 五维/检查项/证据状态/评分天花板继承并改造自 Better Harness（MIT）的 Agent Work Loop 模型。
@@ -93,7 +93,7 @@ class TaskEpisode(BaseModel):
 
 ```python
 class EvidenceBundle(BaseModel):
-    bundle_id: str; bundle_version: int = 1
+    bundle_id: str; bundle_version: int = 3   # 基线随头部 schema 版本同步（ADR-0009 起 bundle=3）
     scope: Scope          # target, hosts, window(since/until), depth(quick/normal), locale
     lanes: Lanes          # 三条，结构上互不可见（不同 Python 子模型，禁止交叉引用）
       session:  SessionLane   # episodes: tuple[TaskEpisode, ...]
@@ -178,7 +178,10 @@ class InterventionRecord(BaseModel):
 ```
 
 `Comparison` 必须记录：对哪些 Episode 比较、可比性置信度、**拒绝比较的排除清单及原因**
-（混杂）、统计方法、效应量、CI、样本缺口（"还需 N 个可比任务"）。
+（混杂）、统计方法、效应量、CI、样本缺口（"还需 N 个可比任务"）、
+`axis_diff: Literal["single", "multi", "none"]`（单轴归因，ADR-0009）：
+single = 恰一处理轴不同，才可产出归因结论（verified 资格）；
+multi = 多轴不同，仅 descriptive，无 verified 资格；none = 零轴，记为噪声地板测量样本。
 
 ## 5. 评估模型：五维 × 15 检查（继承原版，稳定 ID）
 

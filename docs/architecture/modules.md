@@ -137,7 +137,7 @@ budget/           每角色 token/费用上限；超限策略：裁剪 Episode �
 |------|------|
 | 历史库 | SQLite（WAL）：表结构见 [longitudinal.md](longitudinal.md) §store + 迁移 |
 | Episode 匹配 | 可比 Episode 检索：结构化特征过滤（硬条件：同 check 相关行为、同难度桶）→ 向量相似度软排序 → `Comparability{confidence, exclusions[]}` |
-| 混杂否决 | model_versions/host/llm_provider/依赖哈希不一致 → 直接 excluded（E4，ADR-0007），理由机器可读 |
+| 单轴归因 | axis_diff 三态（single/multi/none，见 longitudinal.md §confound，ADR-0009）；multi 无 verified 资格，理由机器可读 |
 | 统计检验 | bootstrap 置信区间 + CUSUM 变点；`Verdict{improved|flat|worsened|insufficient, effect, ci, missing_n}` |
 | 状态机驱动 | 唯一能把 finding 迁移到 verified/regressed 的位置（白名单见 [data-model.md](data-model.md) §4.2） |
 

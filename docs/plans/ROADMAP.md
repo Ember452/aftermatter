@@ -40,6 +40,7 @@
 | P2-4 | 宿主扩展 | Qwen Code / Copilot / Pi / Kimi / Grok 适配器；同时适配器改 entry-points 插件化开放第三方贡献 | 适配器数 >6（结构 §7 既定触发线）或外部贡献者请求 | SessionAdapter Protocol 冻结 |
 | P2-5 | 沙箱升级 | D5 容器池（预热/复用）+ 重放范围从"验证命令真伪"扩展到构建环境 | 沙箱复跑使用率稳定 >30% run，或复跑耗时成为体验瓶颈 | replay_ok 唯一入口不变 |
 | P2-6 | 契约包独立 | schemas 被外部工具消费后发布 `aftermatter-contracts`（结构 §7） | 出现第一个非本项目消费者 | 版本化策略不变 |
+| P2-7 | 受控实验形态 | 借鉴原版 harness-experiment（其 ADR-0004/0005）：同 checkpoint 双车道主动对跑（改前/改后同任务），与我们的被动统计纵向互补 | 用户明确需要"同任务对跑"能力，且驱动 fresh agent 的宿主协议基础设施就绪 | 实验结论仍经 Comparison（axis_diff 语义）入 verified，不开第二状态机 |
 
 **二期启动判定**（何时从候选转执行）：PRD §9 三类指标至少两类达标——
 ① 增长（Star/下载/外部 issue 有真实用户信号）；② 可信性（对抗拦截率、引用通过率稳定）；
@@ -53,7 +54,7 @@
   harness 治理报告——这是"团队视角"主张的远期形态
 - **生态**：适配器 SDK 与贡献指南、脱敏 case studies（借鉴原版 case-studies 路径，
   以证据为边界的运行示例）
-- **方法论输出**：纵向验证机制（混杂否决 + 小样本统计）独立成文，是差异化主张的
+- **方法论输出**：纵向验证机制（单轴归因 + 噪声地板 + 小样本统计）独立成文，是差异化主张的
   学术/博客延伸，反哺获客
 
 ## 5. 永久非目标（每阶段 reaffirm，防 scope 漂移）
@@ -72,6 +73,8 @@
 | D-4 | 服务端托管平台与成本上限 | 二期启动前 |
 | D-5 | open-core 许可边界（云版哪些模块不开源） | 商业线启动前 |
 | D-6 | docs 一致性检查脚本（scripts/ 下校验跨文档术语/引用一致）是否进 M6 | v1.0.0 前 |
+| D-7 | tests/ 是否改按领域分组（借鉴原版 agents/cli/governance/learning/reporting）替代按 src 镜像 | M1 前（ fixture 大量入场前决策成本最低） |
+| D-8 | 报告是否借鉴原版 templates/style 读者视角模板族（executive/analyst/audit-scorecard）作二期皮肤 | 二期启动前 |
 
 ## 7. 维护规则
 
