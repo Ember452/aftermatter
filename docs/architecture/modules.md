@@ -5,13 +5,13 @@
 > 每个模块给出：职责一句话、公共接口（Protocol）、允许依赖、测试要求。
 > **新代码必须放对模块；放不进去就先来改这份文档。**
 > 本文档只约束模块职责与接口，**不约束目录内文件名**；仓库级目录契约见
-> [../aftermatter-项目结构.md](../aftermatter-项目结构.md)。
+> [../REPO-LAYOUT.md](../REPO-LAYOUT.md)。
 
 ---
 
 ## 0. 模块划分
 
-目录树契约唯一来源：[../aftermatter-项目结构.md](../aftermatter-项目结构.md) §2，
+目录树契约唯一来源：[../REPO-LAYOUT.md](../REPO-LAYOUT.md) 的“§2 src/aftermatter 模块骨架”，
 本文档不再维护副本（消除双写漂移）；各模块内部设计见 INDEX 所列 12 篇。
 模块职责总序：core（基础）→ collectors/episodes/evidence（证据内核）→
 analysis/repair/sandbox/longitudinal/report（判断与产物）→ serve/daemon/cli（装配暴露）。

@@ -3,7 +3,7 @@
 状态: active | 最后更新: 2026-09-21 | 更新时机: 仅里程碑出口与方向级变化（细则变更走 adr/）
 
 > 本文档回答"一期之后往哪走、现在走到哪了"。一期怎么按序做见
-> [aftermatter-开发计划.md](../aftermatter-开发计划.md)，此处不复述。
+> [DEVELOPMENT-PLAN.md](../DEVELOPMENT-PLAN.md)，此处不复述。
 
 ---
 
@@ -14,7 +14,7 @@
 | 已完成 | 证据 |
 |--------|------|
 | 七阶段文档 1–6 | docs/（设计文档/结构/开发计划/AGENTS/architecture 12 篇/adr+specs 首批） |
-| 立项决策留痕 | adr/0001–0006 + specs/2026-09-21 全论证 |
+| 立项决策留痕 | `docs/adr/` 与 `docs/specs/` 全量索引见各自 README |
 | 竞品源码级校准 | specs §2（原版零 LLM 实测、Repair→Validate→Record 人驱动定性） |
 
 **代码**：仅 pyproject 6 行 init 骨架（requires-python 已统一 >=3.12，余由 T0.1 补全）；
@@ -72,9 +72,10 @@
 | D-3 | 沙箱镜像策略（通用 slim vs 复用项目镜像） | T5.1 前 |
 | D-4 | 服务端托管平台与成本上限 | 二期启动前 |
 | D-5 | open-core 许可边界（云版哪些模块不开源） | 商业线启动前 |
-| D-6 | docs 一致性检查脚本（scripts/ 下校验跨文档术语/引用一致）是否进 M6 | v1.0.0 前 |
+| D-6 | ~~docs 一致性检查脚本（scripts/ 下校验跨文档术语/引用一致）是否进 M6~~ 已决：不等到 M6，即刻上 `scripts/doc_lint/` 与 `.github/workflows/docs.yml` | 已关闭（ADR-0011，2026-09-21） |
 | D-7 | ~~tests/ 是否改按领域分组~~ 已决：保持 src 镜像 + integration 领域命名 | 已关闭（ADR-0010，2026-09-21） |
 | D-8 | 报告是否借鉴原版 templates/style 读者视角模板族（executive/analyst/audit-scorecard）作二期皮肤 | 二期启动前 |
+| D-9 | doc-lint P3 backlog：strip_code 反引号嵌套、Finding→TypedDict、slugify emoji 锚点、actionlint 验证、裸节号 checker（ADR-0011 缓办项） | 扩充 doc-lint 规则时 |
 
 ## 7. 维护规则
 

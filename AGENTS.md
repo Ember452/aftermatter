@@ -1,5 +1,7 @@
 # AGENTS.md — AfterMatter 开发规范
 
+状态: 定稿 | 更新: 2026-09-21 | 对应: [CLAUDE.md](CLAUDE.md)（英文镜像）、[docs/README.md](docs/README.md)（阅读地图）
+
 面向 AI 辅助开发的行为准则与项目约束。与各任务的临时指示合并使用；冲突时本文件优先。
 
 **取舍说明**：以下规范偏向谨慎而非速度。琐碎任务（改错别字、加一行日志）可自行裁量，
@@ -70,7 +72,7 @@
 
 - "加校验" → "先写非法输入的测试，再让它通过"；"修 bug" → "先写复现测试，再修"。
 - 多步任务先给计划：`1. [步骤] → 验证: [检查方式]`。
-- 每个任务对照 `docs/aftermatter-开发计划.md` 第 3 章的验收列自证完成，
+- 每个任务对照 `docs/DEVELOPMENT-PLAN.md` 第 3 章的验收列自证完成，
   **不接受"看起来能跑"作为完成证据**。
 
 ### 5. Decision Capture —— 关键决策动手前留痕
@@ -86,13 +88,13 @@
 
 **规矩**：动手前在 `docs/adr/` 写一页记录（`NNNN-标题.md` 递增编号，模板见其 README）；
 一页装不下升 `docs/specs/`（日期命名）。后续对应 commit footer 必须带 `Refs ADR-NNNN`。
-**未留痕的此类改动，评审直接打回。**历史决策见 `docs/adr/0001–0008` 与 `docs/specs/`。
+**未留痕的此类改动，评审直接打回。**历史决策见 `docs/adr/`（编号索引见其 README）与 `docs/specs/`。
 
 ## 三、文档地图（开发前按任务路由，未读架构文档禁止改核心模块）
 
 | 要做的事 | 必读（按序） |
 |---------|-------------|
-| 任何任务开工前 | `docs/aftermatter-开发计划.md`（本任务行 + 第 1 章执行协议） |
+| 任何任务开工前 | `docs/DEVELOPMENT-PLAN.md`（本任务行 + 第 1 章执行协议） |
 | 改数据模型/状态机 | `docs/architecture/data-model.md`（契约源头）→ 先改文档并递增版本号 |
 | 新增/修改采集适配器 | `docs/architecture/collectors.md` → `modules.md` §2 → `data-model.md` §1 → fixture 目录 |
 | 改分析引擎/多 Agent | `docs/architecture/analysis.md` → `overview.md` §1/§6 → `modules.md` §5 |

@@ -1,5 +1,7 @@
 # CLAUDE.md — AfterMatter Development Guidelines
 
+Status: Accepted | Updated: 2026-09-21 | See also: [AGENTS.md](AGENTS.md) (canonical Chinese source), [docs/README.md](docs/README.md) (reading map)
+
 > **Mirror notice:** this file is the English mirror of [AGENTS.md](AGENTS.md).
 > AGENTS.md is canonical; when you change rules in either file, update the other
 > in the same commit. Content below must stay semantically identical.
@@ -90,7 +92,7 @@ Define success criteria. Loop until verified.
   "Fix a bug" → write a reproducing test first, then fix.
 - For multi-step tasks, state the plan: `1. [step] → verify: [check]`.
 - Self-certify each task against the acceptance column in
-  `docs/aftermatter-开发计划.md` chapter 3 — **"seems to work" is not evidence**.
+  `docs/DEVELOPMENT-PLAN.md` chapter 3 — **"seems to work" is not evidence**.
 
 ### 2.5 Decision Capture — record key decisions before acting
 
@@ -109,13 +111,13 @@ Define success criteria. Loop until verified.
 README) before acting; if it exceeds one page, promote to `docs/specs/`
 (date-prefixed). The corresponding commit footer must carry `Refs ADR-NNNN`.
 **Unrecorded changes of this kind are rejected outright in review.** Historical
-decisions: `docs/adr/0001–0008` and `docs/specs/`.
+decisions: see `docs/adr/` (numbered index in its README) and `docs/specs/`.
 
 ## 3. Documentation Map (route by task; never modify core modules unread)
 
 | To do | Read first (in order) |
 |-------|----------------------|
-| Any task before starting | `docs/aftermatter-开发计划.md` (its task row + ch.1 protocol) |
+| Any task before starting | `docs/DEVELOPMENT-PLAN.md` (its task row + ch.1 protocol) |
 | Data model / state machine | `docs/architecture/data-model.md` (contract source) → edit doc, bump version |
 | Collectors / adapters | `docs/architecture/collectors.md` → `modules.md` §2 → `data-model.md` §1 → fixtures |
 | Analysis engine / multi-agent | `docs/architecture/analysis.md` → `overview.md` §1/§6 → `modules.md` §5 |
