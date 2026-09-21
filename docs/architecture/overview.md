@@ -92,7 +92,7 @@ finding(status=open)
   → InterventionLedger 记账（finding_id, diff, 时间, 环境哈希）
   → finding.status = fixed
   → 后续分析周期：匹配可比较 Episode（结构化特征 + 嵌入双通道）
-      ├─ 混杂不同（model/host/难度）→ 拒绝比较，记录原因（E4）
+      ├─ axis_diff 三态（ADR-0009）：single 可归因 / multi 仅描述 / none 噪声测量（E4）
       └─ 可比 → bootstrap CI / CUSUM 变点（E5）
             ├─ 显著改善 → verified
             ├─ 无显著变化 → 保持 fixed，报告"缺 N 个样本"

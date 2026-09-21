@@ -129,7 +129,7 @@ graph LR
 | T5.3 | blast radius：tree-sitter 调用图算改动影响面 | FR-D4、overview §5 | 多语言 fixture（py/js/go） | 2.5d |
 | T5.4 | 测试映射归因：影响面 × 实际测试覆盖 → 验证空洞 finding | FR-D4 | "改核心只跑边缘测试"fixture 被捕获 | 2d |
 | T5.5 | Episode 匹配双通道：结构化硬过滤 + 本地向量软排序 → Comparability | FR-E3 | 黄金对判别 ≥85% | 3d |
-| T5.6 | 混杂否决：model_versions/host/llm_provider/依赖哈希不一致 → excluded + 机器可读理由 | FR-E4、data-model §2.2 | 混杂注入全拦截 | 1.5d |
+| T5.6 | 单轴归因：axis_diff 三态计算（single 可归因 / multi 仅描述 / none 噪声测量，ADR-0009） | FR-E4、data-model §4.3 | 三态注入行为全正确，理由机器可读 | 1.5d |
 | T5.7 | 统计模块：bootstrap CI + CUSUM 变点 + Verdict（含 missing_n） | FR-E5、modules §8 | 无改进仿真序列 1000 轮误判 ≤50 | 2.5d |
 | T5.8 | 对抗测试集：假 ERef/刷绿 CI/伪造 verified 声称/越界 diff + CI 门禁 job | FR-C6、overview §6.1 | 拦截率 100% | 2d |
 | T5.9 | 双通道评分交叉：LLM 分 × 基线分冲突 → confidence=low + needs_human | FR-C5、overview §6.1 | 冲突用例集全过 | 1.5d |
@@ -214,7 +214,7 @@ graph LR
 **M5**
 - [ ] 复跑与声称不符 → finding 自动升级用例绿（T5.2）
 - [ ] 验证空洞 fixture 被捕获（T5.4）
-- [ ] 匹配黄金对 ≥85%、混杂注入 100% 拒绝比较（docs/tests/ 实测记录）
+- [ ] 匹配黄金对 ≥85%、单轴/多轴/零轴三态注入行为全正确（docs/tests/ 实测记录）
 - [ ] 假阳性仿真 1000 轮 ≤50 误判（脚本与输出进 benchmarks/）
 - [ ] adversarial CI job 拦截率 100%
 

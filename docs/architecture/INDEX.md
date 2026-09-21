@@ -20,7 +20,7 @@
 | [analysis.md](analysis.md) | 基线评分器、三专家、Lead 六阶段、预算、MCP、providers | T2.1–T3.8 |
 | [repair.md](repair.md) | plan/apply 两阶段事务、白名单引擎、revert | T4.1–T4.2 |
 | [sandbox.md](sandbox.md) | 探测/容器规格/重放策略/replay_ok 唯一入口 | T5.1–T5.2 |
-| [longitudinal.md](longitudinal.md) | 表结构、匹配、混杂否决、统计裁决、状态机驱动 | T4.3–T4.5, T5.5–T5.7 |
+| [longitudinal.md](longitudinal.md) | 表结构、匹配、单轴归因、统计裁决（含噪声地板）、状态机驱动 | T4.3–T4.5, T5.5–T5.7 |
 | [report.md](report.md) | 质量门禁错误码、确定性渲染、四件套版式 | T2.6–T2.7 |
 | [serve.md](serve.md) | ingest 幂等、无原文表结构、v1 契约 | T6.6 |
 | [daemon.md](daemon.md) | 调度、磁盘上传队列、掉电恢复 | T6.5 |

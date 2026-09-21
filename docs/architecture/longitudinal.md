@@ -30,11 +30,14 @@ finding 更新 = 插入新 revision 行（不改旧行），当前状态视图 =
 3 输出: Comparability{candidates[], confidence, exclusions[{episode_id, reason_code}]}
 ```
 
-## confound（混杂否决，先于统计）
+## confound（单轴归因，先于统计；ADR-0009 吸收自原版 derived-treatment-axis 规则）
 
-EnvSnapshot 等值比较：model_versions 集合、host、llm_provider、关键依赖哈希（ADR-0007 消歧）。
-任一不一致 → 该候选 excluded（reason=`confound:<字段>`），**不进入统计样本**。
-否决是硬门不是加权项——这是"报告趋势 ≠ 因果证明"的机制化（ADR-0004）。
+对比较双方 diff EnvSnapshot（model_versions/host/llm_provider/依赖哈希）与任务特征，
+计算 `axis_diff` 三态（定义见 data-model §4.3）：
+- `single`：恰一处理轴不同 → 可归因，进入统计；
+- `multi`：≥两轴不同 → 仅输出 descriptive 结论并记录差异清单，无 verified 资格；
+- `none`：零轴 → 不作比较，计入噪声地板测量样本。
+归因资格是硬门不是加权项——这是"报告趋势 ≠ 因果证明"的机制化（我方 ADR-0004/0009）。
 
 ## stats（裁决）
 
@@ -43,7 +46,9 @@ EnvSnapshot 等值比较：model_versions 集合、host、llm_provider、关键�
 方法选择: 样本 < 阈值 → 直接 insufficient(missing_n=功效近似所需)
          前后窗对比 → bootstrap 置信区间(差值)；序列漂移 → CUSUM 变点
 Verdict: {improved | flat | worsened | insufficient, effect, ci, method, missing_n}
-判定规则: improved ∧ ci 下界 > 最小效应 → 支持 verified；worsened/复发信号 → regressed
+噪声地板: 取无干预期间相邻可比 Episode 对构造 run-to-run 变异基线，
+         最小可检效应以地板为参照（吸收原版 identical-pair 设计，ADR-0009）
+判定规则: improved ∧ ci 下界 > max(最小效应, 噪声地板) → 支持 verified；worsened/复发信号 → regressed
 ```
 
 ## driver（状态机唯一入口）
@@ -54,6 +59,7 @@ regressed 自动重开（引用旧台账）。**其他模块想改状态只有�
 
 ## 测试要点
 
-迁移双向兼容（v1 库升 v2 可读）；混杂注入 100% 排除；无改进仿真序列 1000 轮
+迁移双向兼容（v1 库升 v2 可读）；单轴/多轴/零轴三态注入行为
+全正确；噪声地板在仿真序列上估计收敛；无改进仿真序列 1000 轮
 误判 ≤50（假阳性门禁）；missing_n 单调性（样本增加缺口不减）；
 白名单外迁移全拒 + 审计行完整。
