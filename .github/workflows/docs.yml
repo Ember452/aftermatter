@@ -1,0 +1,85 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "scripts/doc_lint/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "scripts/doc_lint/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  doc-lint:
+    name: doc-lint (ADR-0011)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # doc-lint 无第三方依赖，仅用 stdlib；PYTHONPATH 让 python -m doc_lint 生效。
+      # 未来 T0.1 若把 doc_lint 打包成 console-script，此处改用 `aftermatter-doc-lint`。
+      # continue-on-error：退出码（违规=1 / 崩溃=4）不直接判死 job，由汇总步骤裁决；
+      # 否则 step1 失败后 step2 读空/半截报告会产生次生错误，掩盖真因。
+      - name: Run doc-lint (JSON report)
+        env:
+          PYTHONPATH: scripts
+        continue-on-error: true
+        run: python -m doc_lint --root . --json > doc-lint-report.json
+
+      - name: Show violation summary on step output
+        if: always()
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          report = pathlib.Path("doc-lint-report.json")
+          text = report.read_text(encoding="utf-8").strip() if report.exists() else ""
+          if not text:
+              print("doc-lint report 缺失或为空：doc-lint 崩溃（exit 4，见 step1 stderr）或中断")
+              sys.exit(1)
+          try:
+              data = json.loads(text)
+          except json.JSONDecodeError as exc:
+              print(f"doc-lint report 非合法 JSON：{exc}")
+              sys.exit(1)
+          if data.get("error"):
+              print(f"doc-lint internal error: {data['error']}")
+              sys.exit(1)
+          count = data.get("violation_count", 0)
+          print(f"doc-lint: {count} violation(s)")
+          for v in data.get("violations", [])[:50]:
+              loc = v["path"] + (f":{v['line']}" if v.get("line") else "")
+              print(f"  [{v['rule']}] {loc} — {v['message']}")
+          if count > 0:
+              sys.exit(1)
+          PY
+
+      - name: Upload doc-lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-lint-report
+          path: doc-lint-report.json
+          retention-days: 14
