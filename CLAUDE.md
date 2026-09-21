@@ -10,6 +10,15 @@ Merge with per-task instructions; this file wins on conflict.
 **Tradeoff:** these rules bias toward caution over speed. For trivial tasks
 (typo fixes, one-line logs) use judgment; when unsure, follow the rules.
 
+**Meta-rule — docs are not iron law:** this file and everything under docs/ are
+revisable defaults, not immutable law. When either ① a hard conflict between
+documents arises (and the "single source of contract" rule cannot resolve it),
+or ② you hit a decision point the docs do not cover — **stop, interrupt, and
+ask the user to decide**; never silently pick a side. Then record the ruling as
+an ADR (§2.5), update the affected docs, and only then continue. Explicit user
+instructions always outrank this file; a verbal decision not written down is
+treated as never having happened.
+
 ---
 
 ## 1. Project Positioning (align at the start of every session)
