@@ -28,13 +28,19 @@
 5. **命名带已被占**：proofloop（含 CI 门禁质量插件）、reverify（942★）、
    groundproof（声称-事实核验）、retroscope——佐证"证据+验证 agent"赛道升温，
    也排除了这些名字（ADR-0001）。
+6. **全库对照补充（ADR-0009）**：原版完整仓库的 docs/adrs/ADR-0004/0005 与
+   packages/harness/src/experiment|compare 证实它已有主动受控实验系统（多车道
+   checkpoint 重放、单轴归因、matched-pair 规则地板、identical-pair 噪声地板、
+   完整性收据）；其 roadmap 对无人值守/统计纵向关键词零命中。
 
 ## 3. 差异化校准（诚实红线，写简历/README 必须保持此口径）
 
 - ❌ 禁说："原版没有修复闭环 / 没有纵向验证概念"
-- ✅ 正确："原版有 finding-bound repair 流程与 later-validation 模型概念，
-  但停留在人驱动与状态记录；我们提供无人值守执行、执行级复跑（replay_ok）
-  与统计检验（bootstrap/CUSUM + 混杂否决）的机制化实现"
+- ❌ 禁说："原版没有对比/实验系统"（其 ADR-0004/0005 已有主动受控实验，有实现代码）
+- ✅ 正确："原版有 finding-bound repair 与 later-validation 概念；其对比是实验室式
+  主动实验（人发起、规则证据地板）；报告链路里用户拿到的验证证据仍是转述级。
+  我们补的是被动工作流的统计纵向（单轴归因 + 噪声地板 + bootstrap/CUSUM）
+  与无人值守执行"
 - 该口径的可证伪点都在自己代码里：T3.7（normal 拒 partial）、T5.2（replay_ok）、
   T5.7（假阳性仿真），面试追问时逐条可演示。
 
