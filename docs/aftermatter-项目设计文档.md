@@ -18,8 +18,9 @@ AI 编码 Agent（Claude Code、Codex、Cursor 等）改代码很快，但围绕
 | 🧠 经验不沉淀 | 同样的摩擦在下一个任务反复出现 |
 
 2026 年市场信号：泛化 Agent 可观测（tracing/cost/spend）已是红海（LangSmith、AgentOps、
-mission-control 6.3k★ 等），但**"编码 Agent 工作流的证据驱动体检"仍是空白带**——近乎唯一的
-同类是 Better Harness（Node/TS，MIT，寄生宿主，止步于报告）。
+mission-control 6.3k★ 等），但**"面向用户日常工作流的证据驱动体检 + 统计纵向验证"仍是空白带**——
+近乎唯一的同类是 Better Harness（Node/TS，MIT，寄生宿主；其对比能力为主动受控实验，
+精确口径见 §4 与 ADR-0009）。
 
 ## 2. 产品定位
 
@@ -48,7 +49,7 @@ mission-control 6.3k★ 等），但**"编码 Agent 工作流的证据驱动体�
 | 通用 Agent 可观测 | LangSmith / AgentOps / Langfuse / mission-control | 红海，**主动放弃，永不进入** |
 | "harness" 主流语义（执行框架） | awesome-agent-harness 及各对比 | 词义歧义 → 名字不含 harness，仅进 tagline |
 | 会话失败模式分析 | Failproof AI（商业闭源） | 方向被验证，但无本地自托管开源形态 |
-| 五维证据体检 | **Better Harness（原版）** | 唯一同类；寄生宿主（无自带引擎）；修复与纵向验证在其架构图中是 Repair→Validate→Record 的**人驱动流程与模型概念**，但无无人值守执行、无执行级复跑、无统计检验 → 我们把闭环做成机制 |
+| 五维证据体检 | **Better Harness（原版）** | 唯一同类；寄生宿主（无自带引擎）；修复与纵向验证在其架构图中是 Repair→Validate→Record 的**人驱动流程与模型概念**；其 experiment/compare 系统（其 ADR-0004/0005，packages/harness，已实现）是面向 harness 开发的**主动受控实验**（matched-pair 规则地板，非统计显著性检验），而报告链路的验证证据仍为转述级；roadmap 无无人值守方向 → 我们把**用户工作流的被动纵向闭环**做成机制（ADR-0009） |
 | 声称性验证 | reverify(942★) / groundproof | 佐证"模型提议、工具裁决"理念，但是通用组件不是工作流体检 |
 
 ## 5. 差异化主张（全部要能写进简历、经得住代码级追问）
@@ -60,9 +61,13 @@ mission-control 6.3k★ 等），但**"编码 Agent 工作流的证据驱动体�
    变成"证据证明改进了"。注：原版已有 finding-bound repair 流程与 later-validation
    模型概念（诚实校准，勿说"原版没有闭环"），但执行靠宿主会话中的人驱动，且验证
    停留在状态记录——我们把它升级为无人值守、可统计复验的机制。
+   校准注记（ADR-0009）：原版已有主动受控实验系统及其 matched-pair 规则证据地板，
+   但其决策是阈值制非统计显著性检验；bootstrap/CUSUM/置信区间与被动工作流纵向归因
+   仍是我们的增量，两路线互补不互斥。
 3. **执行级证据引擎**：不信任转述——沙箱重放复跑测试/lint/build，
-   blast radius 静态影响面 × 实际测试覆盖面 → 找验证空洞。原版的验证证据只有
-   "转述级"（claimed_ok），其 repair-validate 亦无复跑机制；`replay_ok` 是本项目的增量。
+   blast radius 静态影响面 × 实际测试覆盖面 → 找验证空洞。限定（ADR-0009）：我们做的是
+   **报告链路中对 claimed 命令的沙箱复跑**（claimed_ok→replay_ok，含工作树完整性收据）；
+   原版的 checkpoint lane 重放属主动实验产品面，两者不互相替代。
 4. **Local-first 隐私**：原始会话永不出机器，上传的是脱敏后的结构化 findings。
 
 ## 6. 功能需求
@@ -107,7 +112,7 @@ mission-control 6.3k★ 等），但**"编码 Agent 工作流的证据驱动体�
 |----|------|:---:|------|
 | D1 | Repair Agent：仅对白名单目标（AGENTS.md、CI 配置、缺测试清单等）起草有界修复方案 | P0 | diff 越界 = 直接拒绝，白名单外零写入 |
 | D2 | 修复 dry-run/apply 两阶段，apply 需显式确认（非交互模式必须 --yes） | P0 | 无确认写入路径不存在 |
-| D3 | Verifier：Docker 断网沙箱重放复跑（测试/lint/build），产出结构化结果 | P1 | 声称已通过但复跑失败 → finding 自动升级 |
+| D3 | Verifier：Docker 断网沙箱重放复跑（测试/lint/build），产出结构化结果（含工作树完整性收据，ADR-0009） | P1 | 声称已通过但复跑失败 → finding 自动升级；无收据的复跑标 contextual 不得回填 replay_ok |
 | D4 | blast radius（tree-sitter 静态影响面）× 测试映射归因 → 验证空洞发现 | P1 | 改动核心只跑边缘测试的 fixture 被捕获 |
 | D5 | 容器池与资源限额（CPU/内存/超时/断网默认） | P2 | 限额生效有集成测试 |
 
@@ -118,8 +123,8 @@ mission-control 6.3k★ 等），但**"编码 Agent 工作流的证据驱动体�
 | E1 | SQLite 历史库：Bundle/Finding/Ledger 持久化，schema 版本化迁移 | P0 | 迁移测试前后版本兼容 |
 | E2 | InterventionLedger：修复应用事件流，关联 finding_id | P0 | 台账完整可审计 |
 | E3 | 可比较 Episode 匹配：结构化特征 + 向量嵌入双通道，可比性置信度输出 | P1 | 黄金对（可比/不可比）判别准确率 ≥85% |
-| E4 | 混杂控制：model 版本/宿主/任务难度不同的比较被显式拒绝并给出原因 | P1 | 混杂注入测试全拦截 |
-| E5 | 小样本统计：bootstrap 置信区间 + CUSUM 变点检测；显著才升 `verified`，不显著保持 `open` 并说明缺多少样本 | P1 | 模拟数据上假阳性率 <5% |
+| E4 | 混杂控制（单轴归因，ADR-0009）：恰一处理轴不同才可归因；多轴 → descriptive-only 无 verified 资格；零轴 → 记为噪声测量 | P1 | 三态注入行为全部正确，理由机器可读 |
+| E5 | 小样本统计：bootstrap 置信区间 + CUSUM 变点检测；显著才升 `verified`，不显著保持 `open` 并说明缺多少样本；最小可检效应参照噪声地板（无干预期可比对的 run-to-run 变异基线） | P1 | 模拟数据上假阳性率 <5%；噪声地板估计存在且被 Verdict 引用 |
 
 ### FR-F 报告（report）
 

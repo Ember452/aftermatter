@@ -3,6 +3,9 @@
 日期: 2026-09-21 | 状态: accepted
 
 ## 背景
+勘误注记（ADR-0009）：原版 experiment 系统具备单轴归因与 matched-pair 规则地板；
+本 ADR 所指"无机制"限定于其 History 趋势视图（裸 Δ + 免责文本），不含实验产品面。
+
 原版 History 视图截图核实：其趋势展示仅有一行免责文本
 （"this is a report trend, not causal proof"），机制上无匹配、无混杂控制、无统计检验。
 我们若只抄趋势图，等于把最容易被戳穿的软肋带进自己的报告。
