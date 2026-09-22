@@ -9,23 +9,23 @@
 
 ## 1. 当前阶段快照（唯一时效性章节，每个里程碑出口重写本节）
 
-**阶段**：Phase 0 文档基线 ✅ 完成 → M0 骨架（T0.1–T0.5）✅ 已推 main 并三平台 CI 全绿 → 下一步 M1 证据内核。
+**阶段**：Phase 0 文档基线 ✅ 完成 → M0 骨架（T0.1–T0.5）✅ **出口已闭合**（tag `v0.1.0-m0-skeleton`）→ 下一步 M1 证据内核。
 
 | 已完成 | 证据 |
 |--------|------|
 | 七阶段文档 1–6 | docs/（设计文档/结构/开发计划/AGENTS/architecture 12 篇/adr+specs 首批） |
 | 立项决策留痕 | `docs/adr/` 与 `docs/specs/` 全量索引见各自 README |
 | 竞品源码级校准 | specs §2（原版零 LLM 实测、Repair→Validate→Record 人驱动定性） |
-| M0 骨架（工具链 + 守卫 + CI） | `pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
+| M0 骨架（工具链 + 守卫 + CI） | tag `v0.1.0-m0-skeleton`（annotated，388526f）；`pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
 
-**出口验证**：本地 DoD 六项（ruff check / ruff format --check / pyright / pytest 14 项 / doc-lint /
-pre-commit）与远端矩阵均已实测：main@4601546 上 `ci` run 35674200907 的 lint+typecheck 与
-3.12/3.13 × ubuntu/windows/macos 六格全 success，`docs` 工作流同 commit success。
-**唯一未闭合项**：`v0.1.0-m0-skeleton` tag 未打（ADR-0006 要求打 tag 须经用户批准），
-批准前本节不声称里程碑出口已完成，只声称已推入主干的代码与门禁。
+**出口闭合证据**：main@4601546 上 `ci` run 35674200907 的 lint+typecheck 与
+3.12/3.13 × ubuntu/windows/macos 六格全 success，`docs` 工作流同 commit success；
+用户批准后在 388526f 打 annotated tag `v0.1.0-m0-skeleton`（2026-09-22，已推送）。
+CHANGELOG 的 `[0.1.0]` 段按此 tag 分组（ADR-0006）。
 **代码**：仍无产品逻辑——`src/aftermatter/__init__.py` 只有 docstring 与版本号，运行时依赖为空；
 实现从 M1 T1.1 起。M0 起以 tag 计进度。
-**下一决策点**：M0 出口后确认 D-2/D-3（见 §6）。
+**下一决策点**：D-2（嵌入模型，T5.5 前）与 D-3（沙箱镜像，T5.1 前）按 §6 期限到点再决，
+M1 开工无待决项（本节原写“M0 出口后确认 D-2/D-3”与 §6 期限不一致，已按 §6 口径对齐）。
 
 ## 2. 一期（进行中）：M0–M6
 
