@@ -58,7 +58,10 @@ known-first-party = ["aftermatter"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+# importlib 而不是默认的 prepend：tests/ 按 src 镜像布局（ADR-0010），多宿主下同名测试文件
+# （collectors/claude/test_parse.py 与 collectors/codex/test_parse.py）必然出现，prepend 模式
+# 会因模块名碰撞报 import file mismatch。
+addopts = "-q --import-mode=importlib"
 pythonpath = ["src"]
 asyncio_mode = "auto"
 
