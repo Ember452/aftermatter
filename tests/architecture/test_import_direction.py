@@ -61,10 +61,32 @@ def _top_level_of(dotted: str) -> str | None:
     return rest.split(".")[0] if rest else None
 
 
-def _host_of(dotted: str) -> str | None:
-    """`aftermatter.collectors.claude.parse` → `claude`；非适配器返回 None。"""
+def _host_of(dotted: str, hosts: frozenset[str] | None = None) -> str | None:
+    """`aftermatter.collectors.claude.parse` → `claude`；非适配器返回 None。
+
+    传入 `hosts`（从文件系统实探到的宿主子包名）时只认目录型子包为宿主：
+    `collectors/protocol.py` 这种**共享模块**不是宿主，跨层引用它不算违规（T1.3 首次暴露）。
+    不传时退化为“任何子名都是宿主”，注入样例仍能自证拦截力。
+    """
     parts = dotted.split(".")
-    return parts[2] if len(parts) > 2 and parts[:2] == [_PACKAGE_NAME, "collectors"] else None
+    if len(parts) < 3 or parts[:2] != [_PACKAGE_NAME, "collectors"]:
+        return None
+    candidate = parts[2]
+    if hosts is not None and candidate not in hosts:
+        return None
+    return candidate
+
+
+def _host_packages(package_root: Path) -> frozenset[str]:
+    """collectors 下的**子包**（含 `__init__.py` 的目录）才是宿主。"""
+    collectors = package_root / _PACKAGE_NAME / "collectors"
+    if not collectors.is_dir():
+        return frozenset()
+    return frozenset(
+        child.name
+        for child in collectors.iterdir()
+        if child.is_dir() and (child / "__init__.py").is_file()
+    )
 
 
 def _package_of(module_dotted: str, is_package: bool) -> str:
@@ -107,7 +129,11 @@ def _resolve_targets(package_dotted: str, node: ast.Import | ast.ImportFrom) -> 
 
 
 def _violations_for_source(
-    module_dotted: str, source: str, *, is_package: bool = False
+    module_dotted: str,
+    source: str,
+    *,
+    is_package: bool = False,
+    hosts: frozenset[str] | None = None,
 ) -> list[str]:
     """单个模块的依赖方向违规清单（纯函数，便于注入样例做负向测试）。"""
     package_dotted = _package_of(module_dotted, is_package)
@@ -134,7 +160,7 @@ def _violations_for_source(
                 violations.append(f"{where}: analysis 不得越过 evidence 直连 collectors")
             if their_top in ASSEMBLY_ONLY and my_top not in ASSEMBLY_ONLY:
                 violations.append(f"{where}: 任何模块不得 import 装配层 `{their_top}`")
-            my_host, their_host = _host_of(module_dotted), _host_of(target)
+            my_host, their_host = _host_of(module_dotted, hosts), _host_of(target, hosts)
             if my_host and their_host and my_host != their_host:
                 violations.append(f"{where}: 宿主适配器子包不得互相 import")
     return violations
@@ -162,10 +188,13 @@ def _module_of(package_root: Path, path: Path) -> tuple[str, bool]:
 def _collect_violations(package_root: Path) -> list[str]:
     """扫描真实包树，返回全部依赖方向违规。"""
     violations: list[str] = []
+    hosts = _host_packages(package_root)
     for path in _iter_python_files(package_root):
         module_dotted, is_package = _module_of(package_root, path)
         source = path.read_text(encoding="utf-8")
-        violations.extend(_violations_for_source(module_dotted, source, is_package=is_package))
+        violations.extend(
+            _violations_for_source(module_dotted, source, is_package=is_package, hosts=hosts)
+        )
     return violations
 
 
@@ -272,6 +301,37 @@ def test_guard_allows_legal_directions() -> None:
     ]
     for module_dotted, source in legal:
         assert _violations_for_source(module_dotted, source) == [], f"{module_dotted}: {source}"
+
+
+HOSTS = frozenset({"claude", "codex"})
+
+
+def test_collectors_shared_module_is_not_a_host() -> None:
+    """`collectors/protocol.py` 是共享模块，被各宿主 import 不算跨宿主。"""
+    allowed = _violations_for_source(
+        "aftermatter.collectors.claude.parse",
+        "from aftermatter.collectors.protocol import ParseTally",
+        hosts=HOSTS,
+    )
+    assert allowed == [], allowed
+
+
+def test_cross_host_root_import_is_still_rejected() -> None:
+    """按目录判定不能放过真越界：`claude` 直接 import `codex` 包仍拦得住。"""
+    violations = _violations_for_source(
+        "aftermatter.collectors.claude.parse",
+        "from aftermatter.collectors.codex import CodexAdapter",
+        hosts=HOSTS,
+    )
+    assert any("宿主适配器" in item for item in violations), violations
+
+
+def test_host_packages_are_read_from_the_filesystem(tmp_path: Path) -> None:
+    hosts_root = tmp_path / _PACKAGE_NAME / "collectors"
+    (hosts_root / "claude").mkdir(parents=True)
+    (hosts_root / "claude" / "__init__.py").write_text('"""pkg."""\n', encoding="utf-8")
+    (hosts_root / "protocol.py").write_text('"""mod."""\n', encoding="utf-8")
+    assert _host_packages(tmp_path) == frozenset({"claude"})
 
 
 def test_guard_catches_violating_file_on_disk(tmp_path: Path) -> None:
