@@ -9,7 +9,7 @@
 
 ## 1. 当前阶段快照（唯一时效性章节，每个里程碑出口重写本节）
 
-**阶段**：Phase 0 文档基线 ✅ 完成 → M0 骨架（T0.1–T0.5）已落地，**出口验证未闭合** → 下一步 M1 证据内核。
+**阶段**：Phase 0 文档基线 ✅ 完成 → M0 骨架（T0.1–T0.5）✅ 已推 main 并三平台 CI 全绿 → 下一步 M1 证据内核。
 
 | 已完成 | 证据 |
 |--------|------|
@@ -18,9 +18,11 @@
 | 竞品源码级校准 | specs §2（原版零 LLM 实测、Repair→Validate→Record 人驱动定性） |
 | M0 骨架（工具链 + 守卫 + CI） | `pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
 
-**出口未闭合（按 §7 诚实登记）**：M0 改动尚未 commit，`v0.1.0-m0-skeleton` 未打（需用户批准），
-因此开发计划 §5 的“三平台 CI 矩阵绿”一项不勾选。本地已实测全绿：ruff check / ruff format --check /
-pyright / pytest（tests/architecture 14 项）/ doc-lint / pre-commit。
+**出口验证**：本地 DoD 六项（ruff check / ruff format --check / pyright / pytest 14 项 / doc-lint /
+pre-commit）与远端矩阵均已实测：main@4601546 上 `ci` run 35674200907 的 lint+typecheck 与
+3.12/3.13 × ubuntu/windows/macos 六格全 success，`docs` 工作流同 commit success。
+**唯一未闭合项**：`v0.1.0-m0-skeleton` tag 未打（ADR-0006 要求打 tag 须经用户批准），
+批准前本节不声称里程碑出口已完成，只声称已推入主干的代码与门禁。
 **代码**：仍无产品逻辑——`src/aftermatter/__init__.py` 只有 docstring 与版本号，运行时依赖为空；
 实现从 M1 T1.1 起。M0 起以 tag 计进度。
 **下一决策点**：M0 出口后确认 D-2/D-3（见 §6）。
