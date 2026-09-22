@@ -1,0 +1,53 @@
+name: Bug report
+description: Report behaviour that contradicts the documented contract
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Privacy note: never paste raw agent session content, real absolute paths,
+        tokens or prompts into this issue. Redact first, or attach a minimally
+        reproducible fixture.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `aftermatter --version`, or the commit/tag you built from
+      placeholder: result of `git describe --tags`
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and Python version (`uv run python -c "import sys,platform;print(platform.platform(), sys.version)"`)
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: The shortest command sequence that reproduces it, with the exact output
+      render: shell
+      placeholder: |
+        $ uv run aftermatter analyze --target . --host claude --depth quick
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: |
+        Quote the document that states the expectation (file + section), then what
+        actually happened. If no document promises it, open a feature request instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence
+      description: >
+        Logs or artifact paths are welcome; original session content is not. A finding
+        without verifiable evidence is exactly the failure mode this project is built
+        to avoid, so gaps are fine - say "not observed" instead of guessing.

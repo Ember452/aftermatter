@@ -1,0 +1,43 @@
+name: Feature request
+description: Propose a capability change or an enhancement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is hard today
+      description: The workflow you are trying to accomplish and where it breaks
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed behaviour
+      description: Command, output shape and acceptance criterion - how would a test prove it?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including "do not build this at all"
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Does it change a contract?
+      description: >
+        Data model, state machine, message protocol, dependency choice or scope boundary
+        require a decision record in docs/adr/ before implementation (AGENTS.md §2.5).
+      options:
+        - "No, internal behaviour"
+        - "Yes, data model or state machine"
+        - "Yes, protocol or public interface"
+        - "Yes, new third-party dependency"
+        - "Not sure"
+    validations:
+      required: true
+  - type: input
+    id: task-id
+    attributes:
+      label: Related task or milestone
+      description: Task id from docs/DEVELOPMENT-PLAN.md (T1.3, T5.2, ...), if any
