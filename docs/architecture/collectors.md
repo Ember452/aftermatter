@@ -23,10 +23,14 @@ parse(ref, since_offset)     AsyncIterator[RawEvent]，流式逐行，可断点�
 ### 适配器内部三段流水线
 
 1. **行读取器**：字节偏移 checkpoint（A5 增量索引的地基）；文件哈希变化则 checkpoint 失效重读
-2. **行分类器**：宿主 JSON 行 → 语义 kind 映射表（每宿主一张声明式映射 + 兜底 unparsed）；
-   未知 kind **不猜**：计入 `unparsed_count`，保留 ERef 与有界摘要
+2. **行分类器**：宿主 JSON 行 → 语义 kind 映射表（每宿主一张声明式映射）；三类去向严格分开——
+   映射表命中的会话事件→`parsed`；本就不属 L0 事件模型的非会话事件（宿主侧快照、标题、
+   队列等）→`ignored`（带类型名 reason）；映射表外的**未知 type**→`unparsed`（保留 ERef 与
+   有界摘要）。**只有 `unparsed` 是“格式漂移第一信号”**，把预期忽略塞进它会淹没信号（ADR-0016）
 3. **事件构造器**：填充 RawEvent 必填面（tool_name/target_paths/permission/result_ok/model），
-   每条自带指向原始行字节区间的 ERef；路径经 `core.norm_path` 归一，工作区外路径标记 `outside`
+   每条自带指向原始行字节区间的 ERef（含 `source_id`，见 data-model §0.1）；路径经 `core.norm_path`
+   归一。工作区外路径本期**不进入 `target_paths`、只计入 `ParseStats.outside_path_count`**（`RawEvent`
+   无 outside 字段；Episode 侧的 outside 语义待 T1.7 真正需要时再入契约，ADR-0016）
 
 ### 防自污染
 
