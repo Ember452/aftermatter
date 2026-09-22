@@ -1,5 +1,67 @@
 [project]
 name = "aftermatter"
-version = "0.1.0"
+description = "Evidence-based review of AI coding agent workflows."
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
+authors = [{ name = "Solis" }]
+keywords = [
+    "ai-coding-agent",
+    "harness-engineering",
+    "evidence",
+    "session-analysis",
+    "workflow-review",
+]
+dynamic = ["version"]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Ember452/aftermatter"
+Repository = "https://github.com/Ember452/aftermatter"
+Documentation = "https://github.com/Ember452/aftermatter/tree/main/docs"
+
+# 刻意极简：runtime 依赖为空，各库在首次真正 import 的任务里再加（ADR-0012 决定 2）。
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pyright>=1.1.350",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aftermatter"]
+
+# 版本号单一来源：pyproject 用 dynamic，真值写在包里。
+[tool.hatch.version]
+path = "src/aftermatter/__init__.py"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "scripts", "tests"]
+target-version = "py312"
+# ruff 0.16 会把 Markdown 里的 ```python 代码块当格式化对象，改写 docs/ 下的示意代码
+# 等于篡改契约文档；docs 归 doc-lint 管，这里显式排除。
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["aftermatter"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]
+asyncio_mode = "auto"
+
+[tool.pyright]
+include = ["src", "tests", "scripts"]
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
+reportUnnecessaryTypeIgnoreComment = true
