@@ -83,6 +83,7 @@ M1 开工无待决项（本节原写“M0 出口后确认 D-2/D-3”与 §6 期�
 | D-7 | ~~tests/ 是否改按领域分组~~ 已决：保持 src 镜像 + integration 领域命名 | 已关闭（ADR-0010，2026-09-21） |
 | D-8 | 报告是否借鉴原版 templates/style 读者视角模板族（executive/analyst/audit-scorecard）作二期皮肤 | 二期启动前 |
 | D-9 | doc-lint P3 backlog：strip_code 反引号嵌套、Finding→TypedDict、slugify emoji 锚点、actionlint 验证、裸节号 checker（ADR-0011 缓办项） | 扩充 doc-lint 规则时 |
+| D-10 | Finding 是否增加“不宣称边界”字段（原版报告内部会写“本条不宣称当前行为已失败”一类的自我限制声明；我们现有 consequence/expected_outcome 只写宣称了什么）。属契约变更，需先改 data-model 并递增 finding schema 版本 + 落 ADR | T2.1 前（Finding 模型定稿前） |
 
 ## 7. 维护规则
 

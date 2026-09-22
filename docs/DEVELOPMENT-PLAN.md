@@ -91,7 +91,7 @@ graph LR
 | T2.4 | 证据状态判定 + 评分天花板校验器（59/74/84/94/100 截断） | overview §6.3 | 越天花板分数写入必拒 | 1.5d |
 | T2.5 | Finding 状态机：7 状态 + 流转白名单 + wontfix 出口 + revision 不可变 | data-model §4.2 | 白名单外迁移代码层拒绝 + 告警测试 | 2d |
 | T2.6 | report-quality 校验器：无证据断言/矛盾状态/缺比较边界声明 → 拒绝渲染 | modules §9、FR-F4 | 违规报告样例全拦截 | 1.5d |
-| T2.7 | HTML/MD 渲染器 + 四件套发现卡（影响/预期产出/有界修复/验收检查） | FR-F1/F2 | 自包含零外链；`Unobserved` 如实呈现 | 2.5d |
+| T2.7 | HTML/MD 渲染器 + 四件套发现卡（影响/预期产出/有界修复/验收检查） | FR-F1/F2 | 自包含零外链；`Unobserved` 如实呈现；进仓库的演示截图须附可复现生成脚本与产物源文件 | 2.5d |
 
 出口演示：**无任何 LLM 环境**产出完整诚实报告（deterministic-only 即 M2 主形态）。
 
@@ -202,6 +202,7 @@ graph LR
 - [ ] 无 LLM 环境（不设任何 key）跑通 `aftermatter analyze --depth quick --engine deterministic` 产出 report.html + report.md + findings.json
 - [ ] 越天花板分数/空引用 candidate/白名单外状态迁移 三类非法注入全被校验器拒绝
 - [ ] 报告含 rejected 附录与 coverage 声明，`Unobserved` 处无具体断言
+- [ ] 仓库内任何演示截图都可一键重生成：录制脚本与自包含 report.html 产物同源入库（没有复现路径的图不算证据，与 benchmarks 同一条命）
 
 **M3**
 - [ ] `pytest tests/integration/test_dual_brain_parity.py` 绿：双大脑对同一 Bundle 的 findings.json 过同一 schema 校验
