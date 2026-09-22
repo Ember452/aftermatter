@@ -190,7 +190,7 @@ graph LR
 - [x] `uv run ruff check .` 与 `uv run ruff format --check .` 均零违规（两条分开跑，PowerShell 不支持 `&&`）
 - [x] `uv run pyright` 零错误
 - [x] `uv run pytest tests/architecture -q` 绿，且注入违规 import 样例必红（已固化为 `tmp_path` 注入测试，违规文件不留存）
-- [x] 三平台 CI 矩阵绿（main@4601546：`ci` run 35674200907 的 lint+typecheck 与 6 格 pytest 全 success，`docs` 工作流同 commit success）
+- [x] 三平台 CI 矩阵绿（`ci` run 35674200907 的 lint+typecheck 与 6 格 pytest 全 success，`docs` 工作流同 run success；证据以 run 编号与 tag `v0.1.0-m0-skeleton` 为锚，不写 commit sha）
 
 **M1**
 - [ ] `uv run pytest tests/unit/collectors tests/unit/episodes tests/integration/test_bundle_freeze.py -q` 全绿

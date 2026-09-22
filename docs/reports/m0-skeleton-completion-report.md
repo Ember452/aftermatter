@@ -38,6 +38,9 @@ M0 把仓库从"只有设计文档"变成"有门禁、有依赖方向守卫、�
 
 ## 2. 提交序列（每个 commit = 一个逻辑变更）
 
+> ⚠️ 本表的 commit sha 是 2026-09-22 早间的快照；同日仓库执行过 `git filter-branch`（改作者邮箱），
+> 这些 sha 已不可达。按 **message + 序号** 定位仍然有效，详见文末「§10 追加更正」。
+
 | # | commit | 类型 | 内容 | 依赖关系 |
 |---|---|---|---|---|
 | 0 | `2359e37` | `ci(docs)` | 把维护者手写的 4 处 YAML 注释移到所属键上一行，逻辑零改动 | 无 |
@@ -230,3 +233,20 @@ CONTRIBUTING.md 与本报告的表述均按此事实书写，未把"DoD 全绿"�
 | 已就位的基础设施 | 门禁/CI/锁文件/守卫/模板齐备，M1 无需再碰工程化 |
 | 风险预警 | T1.3/T1.4 的黄金 fixture（各 ≥20 条，含畸形/截断/编码陷阱）是**关键路径且不可砍**；fixture 与标注必须先于实现（开发计划 §1 铁律 3） |
 | tag 链 | 已开环 `v0.1.0-m0-skeleton`；M1 出口为 `v0.2.0-m1-evidence-kernel`（ADR-0006），打 tag 仍需批准 |
+
+---
+
+## 10. 追加更正（2026-09-22 晚，不回改上文）
+
+同日仓库执行了 `git filter-branch`：把提交作者邮箱从 gitee noreply 改为 GitHub noreply，
+并 force 更新了 `origin/main`。对本报告的影响与由此定下的锚点口径：
+
+- §2 与 §6 中出现的全部 commit sha（`2359e37` … `ace723d`）以及 tag 对象号 `72da320`
+  **已不可达**，仅作为当时快照保留；改以 **commit message + 序号** 定位。
+- 里程碑锚点未受影响：tag `v0.1.0-m0-skeleton` 仍在（tag 对象随重写重建，仍指向 M0 验收那个 commit），
+  `ci` run **35674200907** 实测仍可访问且为 `completed / success`。
+- 因此定下规范：**对外证据一律用 tag 名与 run 编号，不用 commit sha**——sha 在历史重写、
+  fork 重放等场景下不可靠。已回写 ROADMAP §1 与开发计划 §5。
+- 收尾：`refs/original/*` 备份 ref 已删除（否则一句 `git push --all --tags` 就可能复活旧历史）；
+tag 对象的 tagger 邮箱仍是旧地址（filter-branch 只重写 commit），为使已发布 tag 稳定，
+不重建、不强推。

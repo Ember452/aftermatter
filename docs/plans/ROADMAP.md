@@ -16,11 +16,12 @@
 | 七阶段文档 1–6 | docs/（设计文档/结构/开发计划/AGENTS/architecture 12 篇/adr+specs 首批） |
 | 立项决策留痕 | `docs/adr/` 与 `docs/specs/` 全量索引见各自 README |
 | 竞品源码级校准 | specs §2（原版零 LLM 实测、Repair→Validate→Record 人驱动定性） |
-| M0 骨架（工具链 + 守卫 + CI） | tag `v0.1.0-m0-skeleton`（annotated，388526f）；`pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
+| M0 骨架（工具链 + 守卫 + CI） | tag `v0.1.0-m0-skeleton`（annotated）；`pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
 
-**出口闭合证据**：main@4601546 上 `ci` run 35674200907 的 lint+typecheck 与
-3.12/3.13 × ubuntu/windows/macos 六格全 success，`docs` 工作流同 commit success；
-用户批准后在 388526f 打 annotated tag `v0.1.0-m0-skeleton`（2026-09-22，已推送）。
+**出口闭合证据**：`ci` run 35674200907 的 lint+typecheck 与 3.12/3.13 × ubuntu/windows/macos
+六格全 success，`docs` 工作流同 run success；annotated tag `v0.1.0-m0-skeleton` 已打并推送
+（2026-09-22，用户批准）。同日仓库执行过 `git filter-branch` 历史重写，因此本快照一律
+**以 tag 名与 run 编号为锚，不写 commit sha**（run 与 tag 不受重写影响）。
 CHANGELOG 的 `[0.1.0]` 段按此 tag 分组（ADR-0006）。
 **代码**：仍无产品逻辑——`src/aftermatter/__init__.py` 只有 docstring 与版本号，运行时依赖为空；
 实现从 M1 T1.1 起。M0 起以 tag 计进度。
