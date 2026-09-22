@@ -16,7 +16,8 @@
 **Definition of Done（每任务统一）**：
 
 ```
-uv run ruff check . && uv run ruff format --check .   # 风格
+uv run ruff check .                                   # 风格：规则集 E,F,I,UP,B,SIM
+uv run ruff format --check .                          # 风格：ruff-format（black 兼容）
 uv run pyright                                        # 公共 API 零错误
 uv run pytest tests/unit/<对应路径> -q                # 本任务测试全绿，且全量 unit 不回退
 ```
@@ -58,7 +59,7 @@ graph LR
 
 | ID | 内容 | 来源 | 验收 | 估时 |
 |----|------|------|------|:---:|
-| T0.1 | pyproject.toml：src layout、依赖最小集、ruff/pyright/pytest 配置 | overview §5、结构 §1 | `uv sync && uv run pytest -q` 通过 | 0.5d |
+| T0.1 | pyproject.toml：src layout、依赖最小集、ruff/pyright/pytest 配置 | overview §5、结构 §1 | `uv sync` 后 `uv run pytest -q` 通过 | 0.5d |
 | T0.2 | 包骨架：只建当期有代码的子包，`__init__` 导出公共 API（禁"未用先建"） | 结构 §2、§8 | `python -c "import aftermatter"` + ruff 通过 | 0.5d |
 | T0.3 | tests/architecture/ import 方向守卫（overview §3 三层规则） | overview §3 | 守卫测试绿 + 注入违规样例必红 | 1d |
 | T0.4 | .github/：ci.yml（3.12/3.13 × ubuntu/windows/macos）、dependabot、issue/PR 模板 | 结构 §5 | PR 上 workflow 全绿 | 0.5d |
@@ -186,7 +187,7 @@ graph LR
 每里程碑收尾时逐项勾选并留存命令输出（对应 PRD §8 出口标准）。
 
 **M0**
-- [x] `uv run ruff check . && uv run ruff format --check .` 零违规
+- [x] `uv run ruff check .` 与 `uv run ruff format --check .` 均零违规（两条分开跑，PowerShell 不支持 `&&`）
 - [x] `uv run pyright` 零错误
 - [x] `uv run pytest tests/architecture -q` 绿，且注入违规 import 样例必红（已固化为 `tmp_path` 注入测试，违规文件不留存）
 - [x] 三平台 CI 矩阵绿（main@4601546：`ci` run 35674200907 的 lint+typecheck 与 6 格 pytest 全 success，`docs` 工作流同 commit success）
