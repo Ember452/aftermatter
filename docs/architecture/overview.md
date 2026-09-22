@@ -63,6 +63,8 @@ collectors / core             （采集与基础层：fs、时间、哈希、git
 ```
 
 - 下层禁止 import 上层；展示层不得直接读写 LLM 客户端或绕过校验器。
+- 例外：`evidence` 的契约模型子包（`evidence/models*`）按 L0 处理——它是所有层的依赖终点；
+  `evidence` 的其余单元（freezer / integrity / redaction）仍停在证据构建层 L1，采集层不得 import。
 - `analysis` 内多 Agent 编排不得越过 `evidence` 直接调 `collectors`（防二次采集造成证据漂移）。
 - 跨模块通信优先传不可变数据模型，不共享可变状态。
 - 违规由架构测试强制（tests/architecture/ 检查 import 方向）。

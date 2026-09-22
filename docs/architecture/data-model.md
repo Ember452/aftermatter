@@ -1,6 +1,6 @@
 # AfterMatter 数据模型
 
-状态: 定稿（设计阶段） | schema 基线版本: event=2 / episode=2 / bundle=3 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash）、ADR-0009（Comparison.axis_diff） | 更新: 2026-09-21
+状态: 定稿（设计阶段） | schema 基线版本: event=3 / episode=2 / bundle=3 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash）、ADR-0009（Comparison.axis_diff）、T1.2（定义 §0.1 ERef，event 2→3）| 更新: 2026-09-22
 
 > 本文档是全项目的契约源头。**改代码可以先乱，改这里的字段必须先改文档并递增版本号。**
 > 五维/检查项/证据状态/评分天花板继承并改造自 Better Harness（MIT）的 Agent Work Loop 模型。
@@ -21,6 +21,34 @@ L0 RawEvent         宿主会话归一化事件（解析器输出）
 
 所有模型为 pydantic v2，`model_config = ConfigDict(frozen=True)`（L0–L2 全不可变；
 L3 状态迁移产生新 revision，不改旧行——纵向审计需要历史）。
+
+## 0.1 ERef · 证据引用（字节区间制）
+
+L0–L3 全部断言的落点单位，跨层引用一律用它，**不发明第二种指针形态**。
+
+```python
+class ERef(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    source_path: str          # core.norm_path 归一后的仓库相对 posix 串（不含主机真实路径）
+    byte_start: int           # >= 0，原始文件字节偏移
+    byte_len: int             # > 0，区间 [byte_start, byte_start + byte_len)
+    digest: str               # 该区间原始字节的 sha256，64 位小写 hex
+    line_no: int | None       # 人类可读提示，永不参与核验判定
+```
+
+核验语义（唯一实现处 `evidence.verify_ref`，流程见 [evidence.md](evidence.md)）：在给定 root 下按
+`[byte_start, byte_start + byte_len)` 重切原始字节、重算 sha256 与 `digest` 比对，
+返回 `ok | not_found | hash_mismatch | out_of_manifest`。
+
+边界与不变量：
+
+- 选字节区间而非行号：本机真实宿主会话实测单行最大 81,464 字节（p99 15,852），
+  行级引用会把 80KB 一并拉进一条证据，且仓库/资产 lane 的证据本就不是行结构。
+- `line_no` 允许与实际行号不一致且不影响结论——它是提示不是断言。
+- 区间越过文件尾 → `not_found`：读不到属于“证据不在”，不等于“内容被改”。
+- `source_path` 越出 root → `out_of_manifest`，**不抛异常**：引用失败必须能进报告 `rejected`
+  附录被审计，异常会被上层吞掉。
+- 只读操作，永不修复、永不写回。
 
 ## 1. L0 · RawEvent
 

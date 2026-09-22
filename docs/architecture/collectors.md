@@ -7,6 +7,10 @@
 宿主私有会话文件 → `RawEvent[]`；仓库 → `RepositoryEvidence`。**只产事实，不做判断**：
 不切 Episode、不评任何分。产出物是唯一对外语言，宿主差异止步于各适配器子包内部。
 
+依赖边界：可 import `core` 与 `evidence` 的**契约模型**（`RawEvent`、`ERef` 住在那里）；
+**不可** import `evidence` 的 freezer / integrity / redaction——采集层不参与冻结与核验
+（由 `tests/architecture/` 守卫强制）。
+
 ## 适配器生命周期（每宿主子包同构）
 
 ```

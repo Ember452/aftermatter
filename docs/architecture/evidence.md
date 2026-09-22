@@ -7,6 +7,11 @@
 全项目**契约唯一定义处**（所有跨层 pydantic 模型住这里）+ Bundle 冻结 + 完整性核验 +
 脱敏管道。不做采集（调 collectors 公共 API）、不做分析（只提供输入）。
 
+分层例外：`models` 子包（`aftermatter.evidence.models*`）按 **L0** 参与依赖方向判定，
+允许被 `collectors` / `episodes` import；`integrity` / `freezer` / `redaction` 仍是证据构建层
+L1 的公共 API，采集层不得 import（否则“采集依赖冻结”成环）。守卫只认 `models` 子路径这一条形
+式，不是把整包 `evidence` 降为 L0。
+
 ## 内部分区
 
 | 单元 | 内容 | 对外性 |
@@ -33,7 +38,9 @@ reason_code 是封闭枚举（`no_session_files / host_version_unknown / parse_b
 
 ## verify_ref（引用闸，被 Lead 与 MCP submit 共用）
 
-解析 ERef → 定位原始字节 → 重算哈希 → 与 Manifest 比对。
+解析 ERef → 定位原始字节 → 重算哈希 → 与 Manifest 比对。字段定义与边界不变量见
+[data-model.md](data-model.md) §0.1（T1.2 已落 `verify_ref(eref, entries, *, root)` 核心，
+Bundle 外壳与 Manifest 构建属 T1.8）。
 返回 `ok | not_found | hash_mismatch | out_of_manifest`，**只读操作，永不修复**。
 性能路径：Manifest 索引预载 + LRU 缓存已验证 ERef（缓存 key 含 bundle_id，无跨 bundle 污染）。
 

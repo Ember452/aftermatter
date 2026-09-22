@@ -36,7 +36,7 @@ analysis/repair/sandbox/longitudinal/report（判断与产物）→ serve/daemon
 | 职责 | 把宿主私有会话文件解析为 `RawEvent[]`；扫描仓库产出 `RepositoryEvidence` |
 | 接口 | `class SessionAdapter(Protocol)`: `discover(workspace)->list[SessionRef]`（找文件+识别格式版本）、`parse(ref, since_offset)->AsyncIterator[RawEvent]`（流式、可断点）、`healthcheck()->AdapterHealth`（版本是否在支持矩阵内） |
 | 关键设计 | ① 版本探测先行：文件头/字段特征识别宿主版本，未知版本 → `unparsed_count` + 显式降级，**绝不猜测映射**；② 剔除自身产物路径（防自我污染）；③ 增量：`since_offset` 配合内容哈希缓存（A5） |
-| 依赖 | core |
+| 依赖 | core, evidence（仅契约模型，见 overview §3 例外） |
 | 测试 | 每家 ≥20 条黄金 fixture（含畸形行、截断文件、编码陷阱）；解析正确率进 CI |
 
 ## 3. episodes — L1 重建
@@ -54,9 +54,9 @@ analysis/repair/sandbox/longitudinal/report（判断与产物）→ serve/daemon
 | 项 | 内容 |
 |----|------|
 | 职责 | 全部跨层数据模型的**唯一定义处**（[data-model.md](data-model.md) 的代码化身）；Bundle 冻结、IntegrityManifest、脱敏管道 |
-| 接口 | `freeze(scope, lanes, ...) -> EvidenceBundle`（写 run-dir，内容寻址）；`redact(model, level)->model`；`verify_ref(bundle, eref)->bool`（引用闸的确定性核心） |
+| 接口 | `freeze(scope, lanes, ...) -> EvidenceBundle`（写 run-dir，内容寻址）；`redact(model, level)->model`；`verify_ref(eref, entries, *, root) -> VerifyOutcome`（引用闸的确定性核心，四态见 evidence.md §verify_ref；Bundle 外壳属 T1.8） |
 | 关键设计 | ① Lane 模型互斥：`SessionLane/ProjectLane/AssetsLane` 无交叉字段，专家输入类型即隔离；② 脱敏分级管道 raw/standard/minimal 为纯函数 + 属性测试（secret 正则库必过）；③ JSON Schema 由模型导出版本化入 `schemas/`，报告/服务端复用 |
-| 依赖 | core |
+| 依赖 | core；本模块的 models 子包按 L0 对外（其余单元仅上层可 import） |
 | 测试 | 冻结幂等、哈希篡改必被 verify_ref 拒绝（对抗夹具）、脱敏泄漏扫描 |
 
 ## 5. analysis — 大脑（最重模块）
