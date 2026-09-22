@@ -12,7 +12,9 @@ from aftermatter.core.fingerprint import fingerprint
 from aftermatter.evidence.models import ERef, SourceEntry
 
 DIGEST = hashlib.sha256(b"line-one\n").hexdigest()
+SOURCE_ID = hashlib.sha256(b"claude\0~/.claude/projects").hexdigest()[:12]
 VALID_REF: dict[str, Any] = {
+    "source_id": SOURCE_ID,
     "source_path": "sessions/a.jsonl",
     "byte_start": 0,
     "byte_len": 9,
@@ -27,7 +29,12 @@ def _eref(**overrides: Any) -> ERef:
 
 
 def _entry(**overrides: Any) -> SourceEntry:
-    payload: dict[str, Any] = {"path": "sessions/a.jsonl", "sha256": DIGEST, "size": 9}
+    payload: dict[str, Any] = {
+        "source_id": SOURCE_ID,
+        "path": "sessions/a.jsonl",
+        "sha256": DIGEST,
+        "size": 9,
+    }
     payload.update(overrides)
     return SourceEntry(**payload)
 
@@ -38,7 +45,7 @@ def test_valid_erefs_and_optional_line_no() -> None:
     assert _eref(byte_start=9, byte_len=1, line_no=2).byte_start == 9
 
 
-@pytest.mark.parametrize("field", ["source_path", "byte_start", "byte_len", "digest"])
+@pytest.mark.parametrize("field", ["source_id", "source_path", "byte_start", "byte_len", "digest"])
 def test_required_fields_are_enforced(field: str) -> None:
     payload = dict(VALID_REF)
     payload.pop(field)
@@ -65,6 +72,17 @@ def test_source_path_must_be_repo_relative(value: str) -> None:
 def test_dotted_file_names_are_not_parent_segments() -> None:
     assert _eref(source_path="sessions/a..b.jsonl").source_path == "sessions/a..b.jsonl"
     assert _eref(source_path=".").source_path == "."
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", "abc", SOURCE_ID.upper(), SOURCE_ID[:-1], SOURCE_ID + "0", "g" * 12],
+)
+def test_source_id_shape(value: str) -> None:
+    with pytest.raises(ValidationError):
+        _eref(source_id=value)
+    with pytest.raises(ValidationError):
+        _entry(source_id=value)
 
 
 @pytest.mark.parametrize(

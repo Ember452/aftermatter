@@ -11,6 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 # 完整宽度 sha256 的十六进制表示。core.fingerprint 只交付 16 位去重指纹，
 # 引用闸要的是可比对的全文哈希（core.md：core 不发明第二套宽度）。
 SHA256_HEX_PATTERN = r"^[0-9a-f]{64}$"
+# 证据源根的稳定别名（data-model §0.1）：跨边界数据只出现它，不出现源根路径。
+SOURCE_ID_PATTERN = r"^[0-9a-f]{12}$"
 
 
 def _has_drive_prefix(value: str) -> bool:
@@ -18,11 +20,11 @@ def _has_drive_prefix(value: str) -> bool:
     return len(value) >= 2 and value[1] == ":" and value[0].isalpha()
 
 
-def _require_repo_relative(value: str) -> str:
+def _require_source_relative(value: str) -> str:
     """跨边界数据里不允许出现主机绝对路径、反斜杠或上跳段。
 
-    这是隐私红线的结构化表达：`ERef.source_path` 必须是 `core.norm_path` 的输出形态，
-    所以真实路径在进入模型之前就必须已被归一，无法靠调用方自觉绕过。
+    这是隐私红线的结构化表达：`ERef.source_path` 是相对其 `source_id` 所指源根的 posix 串
+    （`core.norm_path` 的输出形态），真实路径必须在进入模型之前就被归一，不靠调用方自觉。
     实测会漏的一类是盘符绝对路径（`C:/repo/...`）：它既不以 `/` 开头也不含反斜杠（当写法
     为 posix 分隔时），必须单独拒——否则真实主机路径会直接跟进报告。
     """
@@ -40,6 +42,7 @@ class ERef(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
+    source_id: str = Field(pattern=SOURCE_ID_PATTERN)
     source_path: str
     byte_start: int = Field(ge=0)
     byte_len: int = Field(gt=0)
@@ -49,7 +52,7 @@ class ERef(BaseModel):
     @field_validator("source_path")
     @classmethod
     def _validate_source_path(cls, value: str) -> str:
-        return _require_repo_relative(value)
+        return _require_source_relative(value)
 
 
 class SourceEntry(BaseModel):
@@ -57,6 +60,7 @@ class SourceEntry(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
+    source_id: str = Field(pattern=SOURCE_ID_PATTERN)
     path: str
     sha256: str = Field(pattern=SHA256_HEX_PATTERN)
     size: int = Field(ge=0)
@@ -64,4 +68,4 @@ class SourceEntry(BaseModel):
     @field_validator("path")
     @classmethod
     def _validate_path(cls, value: str) -> str:
-        return _require_repo_relative(value)
+        return _require_source_relative(value)
