@@ -9,8 +9,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from ._core import Finding, iter_markdown_docs, strip_code
 
@@ -81,9 +81,7 @@ def check(repo_root: Path) -> list[Finding]:
                 continue
             if anchor and resolved.suffix == ".md":
                 if resolved not in anchor_cache:
-                    anchor_cache[resolved] = _collect_anchors(
-                        resolved.read_text(encoding="utf-8")
-                    )
+                    anchor_cache[resolved] = _collect_anchors(resolved.read_text(encoding="utf-8"))
                 anchors = anchor_cache[resolved]
                 if anchor.lower() not in anchors:
                     findings.append(

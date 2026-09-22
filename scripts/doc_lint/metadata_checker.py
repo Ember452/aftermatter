@@ -33,9 +33,7 @@ def _is_exempt(path: Path, repo_root: Path) -> bool:
     if path.name in _EXEMPT_BASENAMES:
         return True
     # docs/adr/*.md 与 docs/specs/*.md 由各自专属 checker 处理
-    if len(parts) >= 2 and parts[0] == "docs" and parts[1] in _EXEMPT_SUBDIRS:
-        return True
-    return False
+    return len(parts) >= 2 and parts[0] == "docs" and parts[1] in _EXEMPT_SUBDIRS
 
 
 def check(repo_root: Path) -> list[Finding]:
@@ -55,7 +53,9 @@ def check(repo_root: Path) -> list[Finding]:
                         "头部 12 行内未找到 `状态:` 字段"
                         "（Draft/Proposed/Accepted/定稿/草稿/Superseded by NNNN）"
                     ),
-                    hint="在标题下第二行加：`状态: <值> | 日期/更新: YYYY-MM-DD | 对应/关联: <链接>`",
+                    hint=(
+                        "在标题下第二行加：`状态: <值> | 日期/更新: YYYY-MM-DD | 对应/关联: <链接>`"
+                    ),
                 )
             )
     return findings

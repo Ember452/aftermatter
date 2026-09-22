@@ -11,8 +11,8 @@ import sys
 import traceback
 from pathlib import Path
 
-from ._core import Finding
 from . import check_all
+from ._core import Finding
 
 
 def _repo_root_from(here: Path) -> Path:
@@ -24,9 +24,7 @@ def _repo_root_from(here: Path) -> Path:
     for candidate in [current, *current.parents]:
         if (candidate / "pyproject.toml").is_file():
             return candidate
-    raise RuntimeError(
-        "未能通过向上查找 pyproject.toml 定位仓库根；请用 --root 显式指定。"
-    )
+    raise RuntimeError("未能通过向上查找 pyproject.toml 定位仓库根；请用 --root 显式指定。")
 
 
 def _format_text(findings: list[Finding]) -> str:
@@ -70,10 +68,12 @@ def main(argv: list[str] | None = None) -> int:
     except Exception:  # 内部错误 → exit 4，与"有违规"=1 区分（architecture/cli.md 契约）
         traceback.print_exc(file=sys.stderr)
         if args.json:
-            print(json.dumps(
-                {"error": "doc-lint internal error", "violation_count": None},
-                ensure_ascii=False,
-            ))
+            print(
+                json.dumps(
+                    {"error": "doc-lint internal error", "violation_count": None},
+                    ensure_ascii=False,
+                )
+            )
         print("doc-lint: internal error (traceback on stderr)", file=sys.stderr)
         return 4
 
