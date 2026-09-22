@@ -6,8 +6,24 @@ Versioning, and milestone releases are tagged as `v0.N.0-<milestone>` (ADR-0006)
 
 ## [Unreleased]
 
-Nothing yet. The next milestone is M1 (deterministic evidence kernel), which is where
+Nothing runnable yet. The next milestone is M1 (deterministic evidence kernel), which is where
 first-party functionality - not scaffolding - starts to accumulate.
+
+### Added
+
+- Bilingual front door: `README.md` is now the Chinese landing page with `README.en.md` as its
+  English mirror, plus brand assets under `docs/assets/` (ADR-0015).
+- `docs/reports/` for milestone closing reports with a fixed skeleton, seeded by the M0 report
+  (ADR-0014).
+- Decision indexes in `docs/adr/README.md` and `docs/specs/README.md`.
+
+### Changed
+
+- `docs/tests/` became the repository's only Chinese-filename exemption, enforced by
+  `policy_checker` (ADR-0013).
+- Acceptance commands in the development plan no longer rely on `&&`, which PowerShell cannot run.
+- External evidence anchors now use tag names and workflow run numbers instead of commit sha, after
+  a `git filter-branch` history rewrite made older sha unreachable.
 
 ## [0.1.0] - 2026-09-22 — tag `v0.1.0-m0-skeleton`
 
