@@ -13,18 +13,20 @@ from collections.abc import AsyncIterator, Mapping
 from datetime import datetime
 from pathlib import Path
 
+from aftermatter.collectors.artifacts import is_self_artifact
 from aftermatter.collectors.claude.discover import discover_sessions
 from aftermatter.collectors.claude.mapping import (
     COMMAND_INPUT_KEYS,
     HOST,
     LIFECYCLE_SUBTYPES,
     PATH_INPUT_KEYS,
+    SELF_ARTIFACT_REASON,
     LineDisposition,
     classify_record,
     content_blocks,
-    is_self_artifact,
     safe_reason,
 )
+from aftermatter.collectors.jsonl import read_lines
 from aftermatter.collectors.protocol import ParseTally
 from aftermatter.core.errors import AfterMatterError, ParseError
 from aftermatter.core.fingerprint import fingerprint
@@ -40,7 +42,6 @@ from aftermatter.evidence.models import (
 )
 
 SUPPORTED_VERSION_PREFIXES = ("2.1.",)
-_BOM = b"\xef\xbb\xbf"
 _EventDraft = tuple[EventKind, str | None, tuple[str, ...], str | None, bool | None]
 
 
@@ -83,22 +84,14 @@ class ClaudeAdapter:
         """流式产出一个会话文件的事件；坏行 fail-soft，坏文件 fail-hard。"""
         raw = await asyncio.to_thread(_read_bytes, ref.path)
         source_path = _source_path(ref, self._sessions_root)
-        size = len(raw)
-        position = since_offset
-        line_no = raw.count(b"\n", 0, min(since_offset, size)) + 1
-        while position < size:
-            end = raw.find(b"\n", position)
-            stop = size if end == -1 else end
-            start, content = _trim_line(raw, position, stop)
-            events, stop_parsing = self._handle_line(ref, source_path, content, start, line_no)
+        for line in read_lines(raw, since_offset):
+            events, stop_parsing = self._handle_line(
+                ref, source_path, line.content, line.byte_start, line.line_no
+            )
             for event in events:
                 yield event
             if stop_parsing:
                 return
-            line_no += 1
-            if end == -1:
-                return
-            position = end + 1
 
     # --- 行级处理 -------------------------------------------------------
 
@@ -110,9 +103,7 @@ class ClaudeAdapter:
         byte_start: int,
         line_no: int,
     ) -> tuple[list[RawEvent], bool]:
-        """返回 (本行事件, 是否终止整文件解析)。"""
-        if not content.strip():
-            return [], False
+        """返回 (本行事件, 是否终止整文件解析)。空行已由 `read_lines` 滤掉。"""
         self._tally.lines_total += 1
         try:
             record = json.loads(content.decode("utf-8"))
@@ -274,7 +265,7 @@ class ClaudeAdapter:
             if not value:
                 continue
             if is_self_artifact(value):
-                self._count(LineDisposition.PARSED, "self_artifact_path", self_artifact=True)
+                self._count(LineDisposition.PARSED, SELF_ARTIFACT_REASON, self_artifact=True)
                 continue
             try:
                 paths.append(norm_path(value, cwd) if cwd else value)
@@ -317,16 +308,6 @@ def _source_path(ref: SessionRef, sessions_root: Path) -> str:
         return norm_path(ref.path, sessions_root)
     except AfterMatterError:
         return Path(ref.path).name
-
-
-def _trim_line(raw: bytes, start: int, stop: int) -> tuple[int, bytes]:
-    """切出一行的可比对字节：去 BOM 前缀与行尾 `\\r`，不含 `\\n`。"""
-    if start == 0 and raw.startswith(_BOM, 0):
-        start += len(_BOM)
-    content = raw[start:stop]
-    if content.endswith(b"\r"):
-        content = content[:-1]
-    return start, content
 
 
 def _as_str(value: object) -> str | None:

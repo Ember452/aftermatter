@@ -38,8 +38,8 @@ MAPPED_TYPES: frozenset[str] = frozenset({"user", "assistant", "system"})
 # 别的工具往同目录写的记录带这些独有键——命中即判不属于本宿主。
 FOREIGN_KEYS: frozenset[str] = frozenset({"atis-latch", "agent-color", "cost-state", "ai-title"})
 
-# 自身产物路径清单（collectors.md §防自污染）：命中即从 target_paths 剔除。
-SELF_ARTIFACT_MARKERS: tuple[str, ...] = (".aftermatter/", ".aftermatter\\")
+# 自身产物路径命中的 reason 名（清单与判定函数在 collectors/artifacts.py，跨宿主共用）。
+SELF_ARTIFACT_REASON = "self_artifact_path"
 
 # compact 是唯一认识的 system subtype；其余 subtype 属未知宿主事件 → unparsed。
 LIFECYCLE_SUBTYPES: frozenset[str] = frozenset({"compact_boundary"})
@@ -81,11 +81,6 @@ def classify_record(record: Mapping[str, object]) -> tuple[LineDisposition, str]
     if record_type in MAPPED_TYPES:
         return LineDisposition.PARSED, record_type
     return LineDisposition.UNPARSED, record_type
-
-
-def is_self_artifact(path: str) -> bool:
-    """路径是否指向 AfterMatter 自己的产物（防自我污染）。"""
-    return any(marker in path for marker in SELF_ARTIFACT_MARKERS)
 
 
 REASON_MAX_LEN = 40

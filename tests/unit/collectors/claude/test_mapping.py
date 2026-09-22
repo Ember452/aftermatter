@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from aftermatter.collectors.artifacts import is_self_artifact
 from aftermatter.collectors.claude import mapping
 from aftermatter.collectors.claude.mapping import LineDisposition, classify_record, content_blocks
 
@@ -46,8 +47,9 @@ def test_foreign_markers_are_positive_evidence_and_beat_everything_else() -> Non
 
 @pytest.mark.parametrize("path", ["/home/u/.aftermatter/runs/b.json", ".aftermatter/x.json"])
 def test_self_artifact_paths(path: str) -> None:
-    assert mapping.is_self_artifact(path) is True
-    assert mapping.is_self_artifact("/repo/src/a.py") is False
+    """防自污染判定已上收到跨宿主共享层（collectors/artifacts.py）。"""
+    assert is_self_artifact(path) is True
+    assert is_self_artifact("/repo/src/a.py") is False
 
 
 def test_content_blocks_normalizes_shapes() -> None:
