@@ -9,6 +9,10 @@
 ⑤ 顶层子包名必须在 `REPO-LAYOUT.md` §2 清单内（把"禁止 utils/common/helpers/base"
    从口头约束变成守卫）。
 
+分层秩的一个契约例外：`evidence` 的 `models` 子包按 L0 计（见 overview §3）——跨层
+数据模型的唯一定义处必须能被采集层 import，否则 `RawEvent` 造不出来；但 `evidence`
+其余单元（freezer/integrity/redaction）仍是 L1，采集层 import 它们依旧判违规。
+
 拦截能力由 `tmp_path` 注入违规样例自证，样例文件不入库——否则 M0 期 `src/` 只有
 一个 `__init__.py`，"零违规"是必然的假绿。
 """
@@ -40,6 +44,8 @@ LAYER_RANK: dict[str, int] = {
     "serve": 3,
     "daemon": 3,
 }
+# 契约模型子包例外：这些子包参与 L0 比较（overview §3、evidence.md 职责边界）。
+MODEL_SUBPACKAGES: dict[str, tuple[str, ...]] = {"evidence": ("models",)}
 # REPO-LAYOUT §2 允许、但不参与分层秩比较的顶层目录（版本化脚本序列，非架构层）。
 UNRANKED = frozenset({"migrations"})
 # 规则③的目标层：真需要 cli 装配 import daemon 时另开 ADR 放宽，不加静默豁免。
@@ -68,6 +74,18 @@ def _package_of(module_dotted: str, is_package: bool) -> str:
     return module_dotted.rsplit(".", 1)[0] if "." in module_dotted else module_dotted
 
 
+def _effective_rank(dotted: str) -> tuple[str | None, int | None]:
+    """返回 (顶层名, 参与比较的秩)；契约模型子包按 L0 计，非本包返回 (None, None)。"""
+    top = _top_level_of(dotted)
+    if top is None:
+        return None, None
+    parts = dotted.split(".")
+    sub_package = parts[2] if len(parts) > 2 else ""
+    if sub_package in MODEL_SUBPACKAGES.get(top, ()):
+        return top, 0
+    return top, LAYER_RANK.get(top)
+
+
 def _resolve_targets(package_dotted: str, node: ast.Import | ast.ImportFrom) -> list[str]:
     """把一条 import 语句解析成绝对点分名（相对导入按所在包展开）。
 
@@ -93,14 +111,13 @@ def _violations_for_source(
 ) -> list[str]:
     """单个模块的依赖方向违规清单（纯函数，便于注入样例做负向测试）。"""
     package_dotted = _package_of(module_dotted, is_package)
-    my_top = _top_level_of(module_dotted)
-    my_rank = LAYER_RANK.get(my_top or "")
+    my_top, my_rank = _effective_rank(module_dotted)
     violations: list[str] = []
     for node in ast.walk(ast.parse(source)):
         if not isinstance(node, ast.Import | ast.ImportFrom):
             continue
         for target in _resolve_targets(package_dotted, node):
-            their_top = _top_level_of(target)
+            their_top, their_rank = _effective_rank(target)
             if their_top is None:
                 continue
             where = f"{module_dotted}:{node.lineno}"
@@ -109,7 +126,6 @@ def _violations_for_source(
                     f"{where}: 未知顶层子包 `{their_top}`（不在 REPO-LAYOUT §2 清单）"
                 )
                 continue
-            their_rank = LAYER_RANK.get(their_top)
             if my_rank is not None and their_rank is not None and their_rank > my_rank:
                 violations.append(
                     f"{where}: `{my_top}`(L{my_rank}) 不得 import 上层 `{their_top}`(L{their_rank})"
@@ -211,6 +227,18 @@ def test_src_top_level_matches_repo_layout() -> None:
             "from aftermatter.collectors.claude.parse import x",
             "宿主适配器",
         ),
+        # 契约模型例外只放 `models`：采集层 import evidence 的其他单元依旧越级
+        (
+            "aftermatter.collectors.claude.parse",
+            "from aftermatter.evidence.freezer import freeze",
+            "不得 import 上层",
+        ),
+        # L0 例外不等于豁免检查：models 自身也不得向上 import
+        (
+            "aftermatter.evidence.models",
+            "from aftermatter.analysis.engine import run",
+            "不得 import 上层",
+        ),
         # ⑤ 兜底目录与未知子包
         (
             "aftermatter.core.timeutil",
@@ -235,6 +263,9 @@ def test_guard_allows_legal_directions() -> None:
         ("aftermatter.report.render", "from aftermatter.core.fingerprint import fingerprint"),
         ("aftermatter.cli.app", "from aftermatter.analysis.deterministic import baseline"),
         ("aftermatter.collectors.claude.parse", "from aftermatter.core.pathutil import norm_path"),
+        # L0 例外正向半边：采集层必须能拿到契约模型，否则 RawEvent 造不出来
+        ("aftermatter.collectors.claude.parse", "from aftermatter.evidence.models import ERef"),
+        ("aftermatter.episodes.segment", "from aftermatter.evidence.models import RawEvent"),
         ("aftermatter.analysis.engine.lead", "from aftermatter.repair.plan import RepairPlan"),
         ("aftermatter.analysis.engine.lead", "from .. import budget"),
         ("aftermatter.migrations.v1", "from aftermatter.longitudinal.store import SCHEMA"),
