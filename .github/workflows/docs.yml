@@ -1,6 +1,7 @@
 name: docs
 
 on:
+  # 推送到下面分支、且改动了 paths 列出的文件时才触发
   push:
     branches: [main]
     paths:
@@ -18,9 +19,11 @@ on:
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
+# 只读权限
 permissions:
   contents: read
 
+# 并发控制
 concurrency:
   group: docs-${{ github.ref }}
   cancel-in-progress: true
@@ -48,7 +51,7 @@ jobs:
         run: python -m doc_lint --root . --json > doc-lint-report.json
 
       - name: Show violation summary on step output
-        if: always()
+        if: always() # 始终执行，无论 step1 成功失败
         env:
           PYTHONPATH: scripts
         run: |
