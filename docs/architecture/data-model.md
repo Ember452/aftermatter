@@ -1,6 +1,6 @@
 # AfterMatter 数据模型
 
-状态: 定稿（设计阶段） | schema 基线版本: event=3 / episode=2 / bundle=3 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash）、ADR-0009（Comparison.axis_diff）、T1.2（定义 §0.1 ERef，event 2→3）| 更新: 2026-09-22
+状态: 定稿（设计阶段） | schema 基线版本: event=4 / episode=2 / bundle=3 / finding=2 | 修订: ADR-0007（host/provider 命名分离）、ADR-0008（frozen_hash）、ADR-0009（Comparison.axis_diff）、T1.2（定义 §0.1 ERef，event 2→3）、T1.3/ADR-0016（§1.1 采集侧类型与 source_id，event 3→4）| 更新: 2026-09-22
 
 > 本文档是全项目的契约源头。**改代码可以先乱，改这里的字段必须先改文档并递增版本号。**
 > 五维/检查项/证据状态/评分天花板继承并改造自 Better Harness（MIT）的 Agent Work Loop 模型。
@@ -29,16 +29,21 @@ L0–L3 全部断言的落点单位，跨层引用一律用它，**不发明第�
 ```python
 class ERef(BaseModel):
     model_config = ConfigDict(frozen=True)
-    source_path: str          # core.norm_path 归一后的仓库相对 posix 串（不含主机真实路径）
-    byte_start: int           # >= 0，原始文件字节偏移
+    source_id: str            # 证据源根的稳定别名（12 位小写 hex），跨边界数据只出现它
+    source_path: str          # 相对该 source_id 所指源根的 posix 串（不含主机路径）
+    byte_start: int           # >= 0，源文件字节偏移
     byte_len: int             # > 0，区间 [byte_start, byte_start + byte_len)
     digest: str               # 该区间原始字节的 sha256，64 位小写 hex
     line_no: int | None       # 人类可读提示，永不参与核验判定
 ```
 
-核验语义（唯一实现处 `evidence.verify_ref`，流程见 [evidence.md](evidence.md)）：在给定 root 下按
-`[byte_start, byte_start + byte_len)` 重切原始字节、重算 sha256 与 `digest` 比对，
-返回 `ok | not_found | hash_mismatch | out_of_manifest`。
+`source_id` 派生规则（必须确定性）：`sha256(f"{host}\0{源根去 HOME 前缀}").hexdigest()[:12]`；
+源根以 HOME 开头时替换为 `~`，剥不掉则用原文参与哈希——**输出永不包含路径**（ADR-0016）。
+引入它是因为 Bundle 的三条 lane 必然同时引用仓库文件与宿主会话文件，两者源根不同目录。
+
+核验语义（唯一实现处 `evidence.verify_ref`，流程见 [evidence.md](evidence.md)）：调用方提供
+`source_id -> 源根` 映射，按 `[byte_start, byte_start + byte_len)` 重切原始字节、重算 sha256
+与 `digest` 比对，返回 `ok | not_found | hash_mismatch | out_of_manifest`。
 
 边界与不变量：
 
@@ -46,8 +51,8 @@ class ERef(BaseModel):
   行级引用会把 80KB 一并拉进一条证据，且仓库/资产 lane 的证据本就不是行结构。
 - `line_no` 允许与实际行号不一致且不影响结论——它是提示不是断言。
 - 区间越过文件尾 → `not_found`：读不到属于“证据不在”，不等于“内容被改”。
-- `source_path` 越出 root → `out_of_manifest`，**不抛异常**：引用失败必须能进报告 `rejected`
-  附录被审计，异常会被上层吞掉。
+- `source_id` 不在调用方提供的映射里、或 `source_path` 越出其源根 → `out_of_manifest`，
+  **不抛异常**：引用失败必须能进报告 `rejected` 附录被审计，异常会被上层吞掉。
 - 只读操作，永不修复、永不写回。
 
 ## 1. L0 · RawEvent
@@ -79,8 +84,46 @@ class RawEvent(BaseModel):
 | `hook_event` | 生命周期钩子结果 | PreToolUse blocked 等 |
 | `lifecycle` | 会话启动/恢复/压缩 | compact、resume |
 
-**解析边界**：适配器只允许产生以上 kind；未知行记录为 `unparsed_count` 并保留 ERef——
-**格式漂移第一信号是计数异常，不是崩溃**（对应设计文档 R1，见 [../PRD.md](../PRD.md) 的“§10 风险与对策”）。
+**解析边界**：适配器只允许产生以上 kind；行级去向分三类且不得合并（见 §1.1 与 collectors.md）——
+映射表命中的会话事件计入 `parsed`；本就不属 L0 事件模型的非会话事件计入 `ignored`（带类型名 reason）；
+映射表外的**未知 type** 才计入 `unparsed_count` 并保留 ERef——**只有它是“格式漂移第一信号”**，
+把预期忽略塞进它会淹没信号（对应设计文档 R1，见 [../PRD.md](../PRD.md) 的“§10 风险与对策”）。
+
+## 1.1 L0 采集侧类型（适配器输出）
+
+定义在 `evidence/models`（跨层模型唯一定义处），由 collectors 产出。三个模型均 `frozen=True`。
+
+```python
+class SessionRef(BaseModel):        # 一个宿主会话文件
+    host: HostId                    # 与 RawEvent.host 同源（ADR-0007）
+    source_id: str                  # 见 §0.1 派生规则
+    path: str                       # 主机绝对路径，仅本机有效；出机数据一律用 source_id
+    format_version: str | None      # 版本探测结果，未知为 None
+    size: int                       # 字节数
+    content_hash: str               # 整文件 sha256，用于 checkpoint 失效判定
+
+class AdapterHealth(BaseModel):     # 宿主版本是否在支持矩阵内
+    host: HostId
+    support: Literal["ok", "unknown", "degraded"]
+    detected_versions: tuple[str, ...]
+
+class ParseStats(BaseModel):        # 行级去向，双计数器是这里的重点
+    lines_total: int
+    parsed: int                     # 映射表命中的会话事件
+    ignored: int                    # 本就不属 L0 事件模型（非会话事件、thinking 块等）
+    unparsed: int                   # 映射表外的未知 type——格式漂移信号
+    not_ours: int                   # 归属判定认为不是本宿主写的，整文件不解析
+    malformed_json: int             # 行不合法（非 JSON / 空对象）
+    excluded_self_artifact: int     # 命中自污染清单被剔除
+    outside_path_count: int         # 落在仓库根之外的路径（不写进 target_paths）
+    reasons: Mapping[str, int]      # 按类型名/原因码的分布，只含枚举键，不含内容
+```
+
+约束：
+
+- `SessionRef.path` 与 `ParseStats.reasons` 的键都是主机无关的枚举串，供 T1.9 的红线泄漏扫描复核。
+- `ParseStats` 是采集侧运行统计，**不进 Bundle**（Bundle 的 `CoverageLedger` 外壳与聚合属 T1.8）；
+- `not_ours` 与 `unparsed` 不得合并：前者是“整文件不属于本宿主”，后者是“属于本宿主但格式漂移”。
 
 ## 2. L1 · TaskEpisode
 
