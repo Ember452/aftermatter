@@ -1,0 +1,2 @@
+{"cwd": "/repo", "gitBranch": "main", "sessionId": "sess-1", "isSidechain": false, "userType": "external", "version": "2.1.252", "uuid": "u-1", "parentUuid": null, "type": "user", "timestamp": "2026-09-20T10:00:00.123Z", "message": {"role": "user", "content": [{"type": "text", "text": "实现登录页"}]}}
+{"cwd": "/repo", "gitBranch": "main", "sessionId": "sess-1", "isSidechain": false, "userType": "external", "version": "2.1.252", "uuid": "u-1", "parentUuid": null, "type": "mode", "timestamp": "2026-09-20T10:00:00.123Z", "mode": "default"}

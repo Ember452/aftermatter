@@ -8,6 +8,26 @@
 from __future__ import annotations
 
 from aftermatter.evidence.integrity import VerifyOutcome, verify_ref
-from aftermatter.evidence.models import ERef, SourceEntry
+from aftermatter.evidence.models import (
+    AdapterHealth,
+    ERef,
+    EventKind,
+    ParseStats,
+    RawEvent,
+    SessionRef,
+    SourceEntry,
+    source_id_for,
+)
 
-__all__ = ["ERef", "SourceEntry", "VerifyOutcome", "verify_ref"]
+__all__ = [
+    "AdapterHealth",
+    "ERef",
+    "EventKind",
+    "ParseStats",
+    "RawEvent",
+    "SessionRef",
+    "SourceEntry",
+    "VerifyOutcome",
+    "source_id_for",
+    "verify_ref",
+]

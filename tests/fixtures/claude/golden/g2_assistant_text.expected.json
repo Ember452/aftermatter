@@ -1,0 +1,25 @@
+{
+  "events": [
+    {
+      "kind": "assistant_message",
+      "seq": 1,
+      "ts": "2026-09-20T10:00:00.123Z",
+      "tool_name": null,
+      "result_ok": null,
+      "target_paths": [],
+      "line_no": 1,
+      "model": "deepseek-v4-pro"
+    }
+  ],
+  "stats": {
+    "lines_total": 1,
+    "parsed": 1,
+    "ignored": 0,
+    "unparsed": 0,
+    "not_ours": 0,
+    "malformed_json": 0,
+    "excluded_self_artifact": 0,
+    "outside_path_count": 0,
+    "reasons": {}
+  }
+}

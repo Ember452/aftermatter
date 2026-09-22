@@ -1,0 +1,1 @@
+{"cwd": "/repo", "gitBranch": "main", "sessionId": "sess-1", "isSidechain": false, "userType": "external", "version": "2.1.252", "uuid": "u-1", "parentUuid": null, "type": "assistant", "timestamp": "2026-09-20T10:00:00.123Z", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "t1", "name": "Read", "input": {"file_path": "/home/u/.aftermatter/runs/b.json"}}]}}

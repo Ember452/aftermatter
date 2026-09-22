@@ -1,0 +1,6 @@
+# 黄金 fixture 与宿主会话样本是字节精确数据：ERef 的 byte_len 与 digest 直接来自原始
+# 字节，行尾一旦被改写，同一份 fixture 在不同 clone 上会解出不同结果（本机
+# core.autocrlf=true 就会把 LF 换成 CRLF）。禁止对它们做行尾转换。
+# 全库行尾策略属独立决定，这里不顺手扩大范围。
+tests/fixtures/** -text
+*.jsonl -text

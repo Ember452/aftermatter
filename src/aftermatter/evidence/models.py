@@ -1,10 +1,17 @@
-"""L0 契约模型：证据引用与证据源条目（`data-model.md` §0.1 的一比一化身）。
+"""L0 契约模型：证据引用、原始事件与采集侧类型（data-model §0.1/§1/§1.1 的化身）。
 
 本模块是依赖方向的例外：它按 L0 参与判定（见 overview §3），因为所有层都需要这里的
 模型。字段语义只在 data-model.md 定义，此处不复述。
 """
 
 from __future__ import annotations
+
+import hashlib
+import os
+from collections.abc import Mapping
+from datetime import datetime
+from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -69,3 +76,91 @@ class SourceEntry(BaseModel):
     @classmethod
     def _validate_path(cls, value: str) -> str:
         return _require_source_relative(value)
+
+
+HostId = Literal["claude", "codex", "cursor", "qoder"]
+
+
+class EventKind(StrEnum):
+    """data-model §1 的七种 kind；未知行不在此枚举内，走 `ParseStats.unparsed`。"""
+
+    USER_PROMPT = "user_prompt"
+    ASSISTANT_MESSAGE = "assistant_message"
+    TOOL_CALL = "tool_call"
+    TOOL_RESULT = "tool_result"
+    PERMISSION_DECISION = "permission_decision"
+    HOOK_EVENT = "hook_event"
+    LIFECYCLE = "lifecycle"
+
+
+class RawEvent(BaseModel):
+    """L0 归一化事件（适配器唯一产出）。"""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    host: HostId
+    session_id: str
+    seq: int = Field(ge=1)
+    ts: datetime
+    kind: EventKind
+    cwd: str
+    evidence_ref: ERef
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{16}$")
+    tool_name: str | None = None
+    target_paths: tuple[str, ...] = ()
+    command_text: str | None = None
+    model: str | None = None
+    permission: Literal["routine", "prompted", "denied", "blocked"] | None = None
+    result_ok: bool | None = None
+
+
+class SessionRef(BaseModel):
+    """一个宿主会话文件；`path` 仅本机有效，出机数据一律用 `source_id`。"""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    host: HostId
+    source_id: str = Field(pattern=SOURCE_ID_PATTERN)
+    path: str
+    size: int = Field(ge=0)
+    content_hash: str = Field(pattern=SHA256_HEX_PATTERN)
+    format_version: str | None = None
+
+
+class AdapterHealth(BaseModel):
+    """探测到的宿主版本是否在支持矩阵内。"""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    host: HostId
+    support: Literal["ok", "unknown", "degraded"]
+    detected_versions: tuple[str, ...] = ()
+
+
+class ParseStats(BaseModel):
+    """行级去向。`ignored` 与 `unparsed` 不得合并（后者才是格式漂移信号）。"""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    lines_total: int = Field(ge=0)
+    parsed: int = Field(ge=0)
+    ignored: int = Field(ge=0)
+    unparsed: int = Field(ge=0)
+    not_ours: int = Field(ge=0)
+    malformed_json: int = Field(ge=0)
+    excluded_self_artifact: int = Field(ge=0)
+    outside_path_count: int = Field(ge=0)
+    reasons: Mapping[str, int] = Field(default_factory=dict)
+
+
+def source_id_for(host: str, source_root: str) -> str:
+    """按 data-model §0.1 派生源标识：输出永不包含路径。
+
+    先剥 HOME 前缀再哈希，是为了让同一目录结构在不同用户名下得到同一个 id——
+    否则纵向比较（T4.4）会在换机器时整片断链。
+    """
+    normalized = source_root.replace("\\", "/")
+    home = os.path.expanduser("~").replace("\\", "/")
+    if home and home != "~" and (normalized == home or normalized.startswith(f"{home}/")):
+        normalized = f"~{normalized[len(home) :]}"
+    return hashlib.sha256(f"{host}\0{normalized}".encode()).hexdigest()[:12]
