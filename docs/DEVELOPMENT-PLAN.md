@@ -186,10 +186,10 @@ graph LR
 每里程碑收尾时逐项勾选并留存命令输出（对应 PRD §8 出口标准）。
 
 **M0**
-- [ ] `uv run ruff check . && uv run ruff format --check .` 零违规
-- [ ] `uv run pyright` 零错误
-- [ ] `uv run pytest tests/architecture -q` 绿，且手工注入违规 import 样例必红
-- [ ] 三平台 CI 矩阵绿
+- [x] `uv run ruff check . && uv run ruff format --check .` 零违规
+- [x] `uv run pyright` 零错误
+- [x] `uv run pytest tests/architecture -q` 绿，且注入违规 import 样例必红（已固化为 `tmp_path` 注入测试，违规文件不留存）
+- [ ] 三平台 CI 矩阵绿（`ci.yml` 已就位，首次推送/开 PR 前无法验证，故不勾）
 
 **M1**
 - [ ] `uv run pytest tests/unit/collectors tests/unit/episodes tests/integration/test_bundle_freeze.py -q` 全绿
