@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation map
+    url: https://github.com/Ember452/aftermatter/blob/main/docs/README.md
+    about: Start here - product contract, architecture, data model, module designs and the build plan
+  - name: Report a security issue
+    url: https://github.com/Ember452/aftermatter/security/advisories/new
+    about: Private vulnerability reporting; never open a public issue for session/credential exposure
