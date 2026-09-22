@@ -102,6 +102,10 @@
 | 其他模块 | 同名内部设计篇，12 篇一览见 `docs/architecture/INDEX.md` |
 | 放不进上面任何一行 | 先在 `docs/adr/` 写一条轻量决策，再动手 |
 
+**文档视距冻结**（防“用写文档代替交付”）：`docs/architecture/` 下锚定**非当期里程碑**的模块内部
+设计篇（对照 `INDEX.md` 的锚定任务列）一律不修订、不新增，只能在对应模块开工的任务里改。
+契约三篇（overview / data-model / modules）不受此限——它们必须超前，否则两个大脑会各自长出一套契约。
+
 全局入口：`docs/README.md`（七阶段阅读地图）。依赖方向硬规则：`docs/architecture/overview.md` §3，
 违规由 `tests/architecture/` 强制。
 

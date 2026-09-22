@@ -197,6 +197,10 @@ graph LR
 - [ ] 真实脱敏 fixture 产出合法 EvidenceBundle，`verify_ref` 对全部 ERef 通过率 100%
 - [ ] 篡改 IntegrityManifest 任一哈希 → verify_ref 拒绝（对抗样例）
 - [ ] 脱敏泄漏扫描：secret 正则库在 standard/minimal 输出上零命中
+- [ ] 真实会话探雷（T1.3 开工前先把本条写成验收脚本）：对本机宿主会话跑 `discover/parse`，
+      如实记录 `unparsed_count`、版本探测分布、未解析类型名与编码异常类别。**原始 dump 只留本机
+      不入库**（AGENTS §4.3 第 4 条、REPO-LAYOUT §3），失败样本一律以 ERef/内容哈希引用，
+      不引原文、不引真实路径——这一项是 M1 里唯一必须吃“真实世界输入”的验收，不得用测试语言替代
 
 **M2**
 - [ ] 无 LLM 环境（不设任何 key）跑通 `aftermatter analyze --depth quick --engine deterministic` 产出 report.html + report.md + findings.json

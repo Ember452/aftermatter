@@ -125,6 +125,12 @@ decisions: see `docs/adr/` (numbered index in its README) and `docs/specs/`.
 | Other modules | Same-named internal design doc; full list in `docs/architecture/INDEX.md` |
 | Fits nowhere above | Write a lightweight ADR in `docs/adr/` first, then act |
 
+**Design-doc distance freeze** (guards against shipping documents instead of software): internal
+design docs under `docs/architecture/` anchored to a milestone other than the current one (see the
+anchored-task column in `INDEX.md`) are frozen — no edits, no new files until that module's task
+starts. The three contract docs (overview / data-model / modules) are exempt: they must stay ahead,
+or the two brains grow apart into two contracts.
+
 Global entry: `docs/README.md` (seven-stage reading map). Hard dependency rules:
 `docs/architecture/overview.md` §3, enforced by `tests/architecture/`.
 
