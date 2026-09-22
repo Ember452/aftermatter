@@ -12,7 +12,10 @@ repos:
       - id: check-yaml
       - id: check-toml
       - id: check-merge-conflict
+      # 上限 2MB：品牌资源与后续真实报告截图天然大于此（维护者裁决 2026-09-22）。
+      # 保留阈值是为了拦住误提交的会话 dump / 模型文件，不是为了抠仓库体积。
       - id: check-added-large-files
+        args: [--maxkb=2048]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # 与 uv.lock 中的 ruff 主版本保持一致

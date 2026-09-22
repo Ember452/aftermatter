@@ -29,8 +29,8 @@ Related: ADR-0011 文档语言分层与写作规范（局部修订其决定 1）
 ## 影响
 
 - `README.md` 重写为中文门面版；新增 `README.en.md`；
-- 新增 `docs/assets/aftermatter-logo.png`（512×512，201 KB）、`docs/assets/aftermatter-hero.jpg`
-  （1600×675，103 KB），均在 `check-added-large-files` 的 500 KB 上限内；
+- `docs/assets/` 收纳品牌图（README 首屏当前用 wordmark 横幅）；图片体积不受门禁抠字节约束，
+  `check-added-large-files` 阈值放宽到 2048 KB，只为拦住误提交的会话 dump 与模型文件；
 - 同步修订：ADR-0011 决定 1 加括注、`docs/README.md` 语言分层表"门面"行、
   `REPO-LAYOUT.md` §1 顶层布局行、`CONTRIBUTING.md` 的 Language 段；
 - PRD §10-R4 要求"差异化主张进 README 首屏 + 承认灵感来源并给贡献路径"：中文门面版首屏
