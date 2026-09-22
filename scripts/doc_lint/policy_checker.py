@@ -2,7 +2,7 @@
 
 规则（对齐 ADR-0011 §决定 1–3）：
 1. **中文文件名**：仓库内所有文件（含 .md 与非 .md）文件名必须为纯 ASCII
-   （英文/数字/连字符/下划线/点）；
+   （英文/数字/连字符/下划线/点）；例外：`docs/tests/` 下的实测文档（ADR-0013）；
 2. **硬编码 ADR 计数区间**（如 `0001–0006`、`0001-0008`）：
    - `docs/adr/` 目录**之外**一律禁止（AGENTS.md、CLAUDE.md、docs/README.md、
      docs/plans/ 等出现即违规——它们在 ADR 增长时必然过期）；
@@ -20,6 +20,9 @@ from pathlib import Path
 from ._core import Finding, iter_markdown_docs, strip_code
 
 _CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+# 中文文件名豁免目录（ADR-0013）：docs/tests/ 的实测文档按 PRD §9 的中文指标名检索更直接。
+# 只这一个目录：再出现第二处需求，视为该约束需整体重议，而不是继续加白名单。
+_CJK_NAME_EXEMPT_DIRS: tuple[tuple[str, ...], ...] = (("docs", "tests"),)
 # ADR 编号固定 4 位且首位为 0（长期不会过 0999）；限定首位避免把
 # "2020-2025""1000-2000" 等年份/页码区间误判为硬编码 ADR 引用。
 _ADR_RANGE_RE = re.compile(r"\b0\d{3}\s*[\u2013\u2014-]\s*0\d{3}\b")
@@ -29,8 +32,14 @@ def _is_under_adr(rel_parts: tuple[str, ...]) -> bool:
     return len(rel_parts) >= 2 and rel_parts[0] == "docs" and rel_parts[1] == "adr"
 
 
+def _is_cjk_name_exempt(path: Path, repo_root: Path) -> bool:
+    """路径是否落在中文文件名豁免目录下。"""
+    rel = path.relative_to(repo_root)
+    return any(rel.parts[: len(prefix)] == prefix for prefix in _CJK_NAME_EXEMPT_DIRS)
+
+
 def _check_filenames(repo_root: Path) -> list[Finding]:
-    """中文文件名扫描。覆盖 docs/、tests/、scripts/、根目录。"""
+    """中文文件名扫描。覆盖 docs/、tests/、scripts/、根目录；docs/tests/ 豁免见 ADR-0013。"""
     findings: list[Finding] = []
     scan_dirs = [repo_root / "docs", repo_root / "tests", repo_root / "scripts"]
     for base in scan_dirs:
@@ -38,6 +47,8 @@ def _check_filenames(repo_root: Path) -> list[Finding]:
             continue
         for path in base.rglob("*"):
             if not path.is_file():
+                continue
+            if _is_cjk_name_exempt(path, repo_root):
                 continue
             if _CJK_RE.search(path.name):
                 findings.append(

@@ -59,9 +59,10 @@ docs/
 | AI 规范 | 双语镜像（例外） | 英文（约定俗成） | `AGENTS.md` + `CLAUDE.md` |
 | 用户向 | 英文 | 英文 | `docs/development/*.md`、`docs/api/*.md` |
 | 内部设计 | 中文 | 英文 | `docs/architecture/`、`docs/adr/`、`docs/specs/`、`docs/plans/`、三份顶层规划文档 |
+| 实测记录 | 中文 | 英文；`docs/tests/` 豁免中文文件名（ADR-0013） | `docs/tests/`、`docs/benchmarks/` |
 | 目录索引 | 中文 | `README.md`（约定俗成） | 各子目录 README |
 
-**核心**：内容与文件名解耦；文件名一律英文。
+**核心**：内容与文件名解耦；文件名一律英文（唯一例外见下方 §2）。
 
 ### 2. 命名规则
 
@@ -73,6 +74,8 @@ docs/
 | Spec | `YYYY-MM-DD-<kebab-title>.md` | `2026-09-21-dual-brain-and-deepening.md` |
 
 **禁用**：中文文件名（历史遗留已清零）、大小写混排（除 `README.md`/`ROADMAP.md` 等约定俗成例外）。
+**唯一例外**：`docs/tests/` 下的实测文档可用中文指标名（ADR-0013 豁免，`policy_checker` 已机器化）；
+再出现第二处豁免需求时，按该 ADR 的约定整体重议而非继续加白名单。
 
 ### 3. 头部元数据（每篇文档顶部必带）
 
