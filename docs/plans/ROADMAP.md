@@ -1,6 +1,6 @@
 # ROADMAP — 演进路线与当前阶段
 
-状态: active | 最后更新: 2026-09-21 | 更新时机: 仅里程碑出口与方向级变化（细则变更走 adr/）
+状态: active | 最后更新: 2026-09-22 | 更新时机: 仅里程碑出口与方向级变化（细则变更走 adr/）
 
 > 本文档回答"一期之后往哪走、现在走到哪了"。一期怎么按序做见
 > [DEVELOPMENT-PLAN.md](../DEVELOPMENT-PLAN.md)，此处不复述。
@@ -9,16 +9,20 @@
 
 ## 1. 当前阶段快照（唯一时效性章节，每个里程碑出口重写本节）
 
-**阶段**：Phase 0 文档基线 ✅ 完成 → 下一步 M0 骨架（未开工）。
+**阶段**：Phase 0 文档基线 ✅ 完成 → M0 骨架（T0.1–T0.5）已落地，**出口验证未闭合** → 下一步 M1 证据内核。
 
 | 已完成 | 证据 |
 |--------|------|
 | 七阶段文档 1–6 | docs/（设计文档/结构/开发计划/AGENTS/architecture 12 篇/adr+specs 首批） |
 | 立项决策留痕 | `docs/adr/` 与 `docs/specs/` 全量索引见各自 README |
 | 竞品源码级校准 | specs §2（原版零 LLM 实测、Repair→Validate→Record 人驱动定性） |
+| M0 骨架（工具链 + 守卫 + CI） | `pyproject.toml`、`src/aftermatter/`、`tests/architecture/`、`.github/`；选型记录见 ADR-0012 |
 
-**代码**：仅 pyproject 6 行 init 骨架（requires-python 已统一 >=3.12，余由 T0.1 补全）；
-实现代码为零（有意为之——计划先行，M0 起以 tag 计进度）。
+**出口未闭合（按 §7 诚实登记）**：M0 改动尚未 commit，`v0.1.0-m0-skeleton` 未打（需用户批准），
+因此开发计划 §5 的“三平台 CI 矩阵绿”一项不勾选。本地已实测全绿：ruff check / ruff format --check /
+pyright / pytest（tests/architecture 14 项）/ doc-lint / pre-commit。
+**代码**：仍无产品逻辑——`src/aftermatter/__init__.py` 只有 docstring 与版本号，运行时依赖为空；
+实现从 M1 T1.1 起。M0 起以 tag 计进度。
 **下一决策点**：M0 出口后确认 D-2/D-3（见 §6）。
 
 ## 2. 一期（进行中）：M0–M6
