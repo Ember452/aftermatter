@@ -21,6 +21,8 @@ GitHub 首页观感偏内部化；③ 交叉引用大量使用节号 `§X`（如
    `docs/api/*`）用英文；面向维护者的内部设计（`docs/architecture/`、
    `docs/adr/`、`docs/specs/`、`docs/plans/`）用中文；`AGENTS.md` 与
    `CLAUDE.md` 保持双语镜像例外（不同 AI 宿主读取不同文件名）。
+   （后续修订：根 `README.md` 改为中文默认、新增 `README.en.md` 英文镜像，
+   其余门面文件仍用英文——见 ADR-0015。）
 2. **文件名一律英文**（后续例外：`docs/tests/` 实测文档的中文指标名，由 ADR-0013 豁免
    并在 `policy_checker` 机器化）：三份顶层文档改名——
    `aftermatter-项目设计文档.md` → `PRD.md`；

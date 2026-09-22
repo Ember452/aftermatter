@@ -18,8 +18,8 @@ aftermatter/
 ├── pyproject.toml               # 唯一的项目元数据 + 依赖 + 全部工具配置（ruff/pyright/pytest）
 ├── uv.lock                      # 锁文件（uv 管理，提交入库）
 ├── LICENSE                      # MIT
-├── README.md                    # 英文主 readme（获客面）
-├── README.zh-CN.md              # 中文 readme（预留，与主 readme 同步维护）
+├── README.md                    # 中文门面 readme（获客面，ADR-0015）
+├── README.en.md                 # 英文镜像 readme，与中文版同结构同事实
 ├── CHANGELOG.md                 # Keep a Changelog 格式，Unreleased 区常开
 ├── CONTRIBUTING.md              # 贡献流程：环境→分支→commit 规范→测试要求→PR
 ├── SECURITY.md                  # 漏洞报告渠道 + 沙箱/隐私边界声明

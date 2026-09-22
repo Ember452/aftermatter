@@ -36,6 +36,7 @@ Related: <关联 ADR / spec / T 任务号 / FR 编号>
 | [0012](0012-m0-toolchain-and-dependency-baseline.md) | M0 工程化工具链与依赖基线 | Accepted |
 | [0013](0013-docs-tests-chinese-filename-exemption.md) | docs/tests/ 中文文件名豁免与实测目录语言定位 | Accepted |
 | [0014](0014-milestone-reports-directory.md) | 里程碑收口报告独立目录 docs/reports/ | Accepted |
+| [0015](0015-readme-chinese-default.md) | 门面 README 默认中文，英文版镜像 | Accepted |
 
 维护约定：新增 ADR **必须在本表补一行**（编号连续由 `adr_checker` 强制，但"漏登记索引行"目前
 是人工评审项；表内链接失效会被 `link_checker` 拦下，所以改名/删除不会悄悄通过）。

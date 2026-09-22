@@ -57,7 +57,8 @@ docs/
 
 | 层级 | 内容语言 | 文件名 | 适用位置 |
 |------|---------|--------|---------|
-| 门面 | 英文 | 英文 | `README.md`、`CONTRIBUTING.md`、`SECURITY.md`、`CHANGELOG.md` |
+| 门面（README） | 中文默认 + 英文镜像 | 英文 | `README.md`（中文）、`README.en.md`（英文）—— ADR-0015 |
+| 门面（其余） | 英文 | 英文 | `CONTRIBUTING.md`、`SECURITY.md`、`CHANGELOG.md` |
 | AI 规范 | 双语镜像（例外） | 英文（约定俗成） | `AGENTS.md` + `CLAUDE.md` |
 | 用户向 | 英文 | 英文 | `docs/development/*.md`、`docs/api/*.md` |
 | 内部设计 | 中文 | 英文 | `docs/architecture/`、`docs/adr/`、`docs/specs/`、`docs/plans/`、`docs/reports/`、三份顶层规划文档 |

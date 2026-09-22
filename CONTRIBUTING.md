@@ -65,7 +65,11 @@ the document, never the other way round.
 
 ## Language
 
-Community-facing files are English; maintainer-facing design documents under `docs/` are
-Chinese (ADR-0011). Identifiers are always English; comments follow the style of the file
-you are editing, and in this repository's internal code that means Chinese comments that
-explain *why*, not code that restates *what* it does.
+The two README files form a bilingual front door: `README.md` is Chinese (default landing) and
+`README.en.md` is its English mirror - they must carry the same structure and the same facts, so a
+PR touching one is expected to touch the other (ADR-0015). The remaining community-facing files
+(`CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`) and `docs/development/`, `docs/api/` are English;
+maintainer-facing design documents under `docs/` are Chinese (ADR-0011). Identifiers and commit
+messages are always English; code comments follow the style of the file you are editing, which in
+this repository's internal code means Chinese comments that explain *why*, not code that restates
+*what* it does.
