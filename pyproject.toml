@@ -13,14 +13,16 @@ keywords = [
     "workflow-review",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "pydantic>=2.8",
+]
 
 [project.urls]
 Homepage = "https://github.com/Ember452/aftermatter"
 Repository = "https://github.com/Ember452/aftermatter"
 Documentation = "https://github.com/Ember452/aftermatter/tree/main/docs"
 
-# 刻意极简：runtime 依赖为空，各库在首次真正 import 的任务里再加（ADR-0012 决定 2）。
+# 刻意极简：只声明当期真正 import 的库（ADR-0012 决定 2：pydantic 在 T1.2 首次落地）。
 [dependency-groups]
 dev = [
     "pytest>=8.0",
