@@ -1,0 +1,1 @@
+{"type": "user", "uuid": "u-1", "sessionId": "s-1", "isSidechain": false, "userType": "external", "cwd": "/repo", "timestamp": "2026-09-21T08:00:00.123Z", "message": {"role": "user", "content": [{"type": "text", "text": "claude \u8bb0\u5f55"}]}}

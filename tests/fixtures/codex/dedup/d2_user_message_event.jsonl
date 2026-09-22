@@ -1,0 +1,3 @@
+{"timestamp": "2026-09-21T08:00:00.123Z", "type": "session_meta", "payload": {"session_id": "s-1", "cwd": "/repo", "cli_version": "0.153.1", "originator": "cli"}}
+{"timestamp": "2026-09-21T08:00:00.123Z", "type": "response_item", "payload": {"type": "message", "role": "user", "id": "m-1", "content": [{"type": "input_text", "text": "内容"}]}}
+{"timestamp": "2026-09-21T08:00:00.123Z", "type": "event_msg", "payload": {"type": "user_message", "message": "同一条用户消息的第二视图"}}

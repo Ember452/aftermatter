@@ -1,0 +1,16 @@
+{
+  "events": [],
+  "stats": {
+    "lines_total": 1,
+    "parsed": 0,
+    "ignored": 0,
+    "unparsed": 0,
+    "not_ours": 1,
+    "malformed_json": 0,
+    "excluded_self_artifact": 0,
+    "outside_path_count": 0,
+    "reasons": {
+      "not_codex_session": 1
+    }
+  }
+}

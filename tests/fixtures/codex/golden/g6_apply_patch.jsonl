@@ -1,0 +1,2 @@
+{"timestamp": "2026-09-21T08:00:00.123Z", "type": "session_meta", "payload": {"session_id": "s-1", "cwd": "/repo", "cli_version": "0.153.1", "originator": "cli"}}
+{"timestamp": "2026-09-21T08:00:00.123Z", "type": "response_item", "payload": {"type": "custom_tool_call", "name": "apply_patch", "input": "*** Begin Patch\n*** Add File: src/new.py\n+print(1)\n", "call_id": "c-2", "id": "cc-1"}}

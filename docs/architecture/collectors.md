@@ -32,6 +32,23 @@ parse(ref, since_offset)     AsyncIterator[RawEvent]，流式逐行，可断点�
    归一。工作区外路径本期**不进入 `target_paths`、只计入 `ParseStats.outside_path_count`**（`RawEvent`
    无 outside 字段；Episode 侧的 outside 语义待 T1.7 真正需要时再入契约，ADR-0016）
 
+### 宿主差异表（均由本机真实会话实测得出，不凭记忆）
+
+| 维度 | Claude Code | Codex CLI |
+|---|---|---|
+| 会话位置 | `~/.claude/projects/**/*.jsonl` | `~/.codex/sessions/YYYY/MM/DD/*.jsonl` |
+| kind 判别 | 单层 `type`（+ `message.content` 块类型） | **两层** `type` × `payload.type` |
+| 双计风险 | 无 | `event_msg/agent_message`、`user_message` 是 `response_item/message` 的第二视图→ 只从 `response_item` 取事件 |
+| 工具入参 | `input` 是对象 | `arguments` 是 **JSON 字符串**，需二次解析；`apply_patch` 走 `input` 文本的 `*** Add/Update/Delete File:` 标记；shell 命令→ `command_text` |
+| `result_ok` | `tool_result.is_error` 取反（实测可用） | `output` 为纯字符串且 24/25 不带退出码 → **恒 `None`**（不猜成败） |
+| `session_id` / `cwd` | 逐行都带 | 只在 `session_meta` → 适配器跳行 carry-forward |
+| `model` | 逐行 `message.model` | 只在 `turn_context`（该行本身是 ignored，但仍需读取） |
+| 归属正面证据 | `atis-latch`/`agent-color`/`cost-state`/`ai-title` 键 | `uuid`/`sessionId`/`isSidechain`/`userType` 等 Claude 信封键 |
+| 未产出 kind | `lifecycle`/`permission_decision`/`hook_event` 实测为 0 | `permission_decision`/`hook_event` 实测为 0（`lifecycle` 有 9 条真实证据） |
+
+三家共用的字节精确行读取在 `collectors/jsonl.py`：必须按 `b"\n"` 切分（`splitlines()`
+会把 JSON 字符串里的 `U+2028` 当行边界，导致 `byte_start`/`byte_len`/digest 与原始字节对不上）。
+
 ### 防自污染
 
 路径正则清单（`~/.aftermatter/`、`*.aftermatter.json` 类）命中即剔除——抄原版
