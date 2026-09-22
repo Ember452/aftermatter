@@ -1,0 +1,23 @@
+# 与 CI 同源的钩子子集：ruff lint + ruff format + 基础文件检查。
+# 运行方式：uvx pre-commit run --all-files（本仓库刻意不把 pre-commit 写进 dev 依赖，
+# 见 ADR-0012 决定；首次运行需要网络拉取钩子仓库，离线时以本地四条 DoD 命令为准）。
+# doc-lint 不在此列：它由 .github/workflows/docs.yml 门禁，local hook 需要注入
+# PYTHONPATH=scripts，PowerShell 与 POSIX 写法不一致，M0 不引入跨平台坑。
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # 与 uv.lock 中的 ruff 主版本保持一致
+    rev: v0.16.8
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
