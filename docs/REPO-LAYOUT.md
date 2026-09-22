@@ -100,6 +100,7 @@ docs/
 ├── specs/                         # 阶段 6：带日期的专题决策文档（YYYY-MM-DD-主题.md）
 ├── adr/                           # 阶段 6：编号一页式轻量决策（NNNN-标题.md）
 ├── plans/                         # 阶段 7：演进计划与阶段快照
+├── reports/                       # 里程碑收口报告（一次性记录，命名 m<N>-<slug>.md，ADR-0014）
 ├── development/                   # 开发专题教程（NN-主题.md，随代码补写）
 ├── tests/                         # 量化指标实测报告（指标测试-<模块>.md）
 ├── benchmarks/                    # 基准测试报告（主题_YYYYMMDD.md）

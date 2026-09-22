@@ -29,6 +29,7 @@ docs/
 ├── specs/                       # 带日期的专题决策与设计文档（较大粒度，时效性强）
 ├── adr/                         # 编号轻量决策记录（一页式：背景/决定/影响）
 ├── plans/                       # 演进计划与阶段快照
+├── reports/                     # 里程碑收口报告（一次性记录，ADR-0014）
 ├── development/                 # 开发专题教程（按模块编号，随代码成熟补写）
 ├── tests/                       # 量化指标实测文档（需人工实测的场景）
 ├── benchmarks/                  # 基准测试报告（命名含日期）
@@ -38,6 +39,7 @@ docs/
 **specs/ 与 adr/ 的分工**：specs/ 放"日期前缀的专题文档"（一次决策一份，含背景与边界，
 如 `2026-09-21-dual-brain-and-deepening.md`）；adr/ 放"编号一页式轻量记录"（`NNNN-标题.md`，
 只写 决定/理由/影响面）。拿不准放哪 → 先写 adr/，长到一页装不下再升 specs/。
+**里程碑收口报告两者都不是**：写完了做了什么的那份去 `reports/`（ADR-0014）。
 
 ## 文档纪律
 
@@ -58,7 +60,7 @@ docs/
 | 门面 | 英文 | 英文 | `README.md`、`CONTRIBUTING.md`、`SECURITY.md`、`CHANGELOG.md` |
 | AI 规范 | 双语镜像（例外） | 英文（约定俗成） | `AGENTS.md` + `CLAUDE.md` |
 | 用户向 | 英文 | 英文 | `docs/development/*.md`、`docs/api/*.md` |
-| 内部设计 | 中文 | 英文 | `docs/architecture/`、`docs/adr/`、`docs/specs/`、`docs/plans/`、三份顶层规划文档 |
+| 内部设计 | 中文 | 英文 | `docs/architecture/`、`docs/adr/`、`docs/specs/`、`docs/plans/`、`docs/reports/`、三份顶层规划文档 |
 | 实测记录 | 中文 | 英文；`docs/tests/` 豁免中文文件名（ADR-0013） | `docs/tests/`、`docs/benchmarks/` |
 | 目录索引 | 中文 | `README.md`（约定俗成） | 各子目录 README |
 
