@@ -82,7 +82,10 @@ def check(repo_root: Path) -> list[Finding]:
                         path=path,
                         rule="adr.bad_status",
                         line=None,
-                        message=f"非法状态值: `{status_value}`；允许: Accepted / Proposed / Superseded by NNNN",
+                        message=(
+                            f"非法状态值: `{status_value}`；"
+                            "允许: Accepted / Proposed / Superseded by NNNN"
+                        ),
                     )
                 )
 
@@ -104,7 +107,10 @@ def check(repo_root: Path) -> list[Finding]:
                         path=path,
                         rule="adr.missing_section",
                         line=None,
-                        message=f"缺少必需段落 `{section}`（模板 {'v2' if num >= _TEMPLATE_V2_START else 'v1'}）",
+                        message=(
+                            f"缺少必需段落 `{section}`（模板 "
+                            f"{'v2' if num >= _TEMPLATE_V2_START else 'v1'}）"
+                        ),
                     )
                 )
 
@@ -130,7 +136,8 @@ def check(repo_root: Path) -> list[Finding]:
                     message=f"最小 ADR 编号应为 0001，实际: {numbers_sorted[0]:04d}",
                 )
             )
-        for prev, curr in zip(numbers_sorted, numbers_sorted[1:]):
+        # 两序列长度天然差 1，strict=True 会抛 ValueError（那就不是纯风格改动了）
+        for prev, curr in zip(numbers_sorted, numbers_sorted[1:], strict=False):
             if curr != prev + 1:
                 findings.append(
                     Finding(
